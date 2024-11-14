@@ -1,0 +1,73 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "appServiceName": {
+            "type": "string",
+            "defaultValue": "snakeGameWebAppUnique"
+        },
+        "sqlServerName": {
+            "type": "string",
+            "defaultValue": "snakeGameSqlServerUnique"
+        },
+        "sqlDatabaseName": {
+            "type": "string",
+            "defaultValue": "snakeGameDBunique"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2021-02-01",
+            "name": "[parameters('appServiceName')]",
+            "location": "eastus",
+            "properties": {
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "WEBSITE_RUN_FROM_PACKAGE",
+                            "value": "1"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2021-02-01-preview",
+            "name": "[parameters('sqlServerName')]",
+            "location": "eastus",
+            "properties": {
+                "administratorLogin": "sqladmin",
+                "administratorLoginPassword": "Password22"
+            },
+            "resources": [
+                {
+                    "type": "databases",
+                    "apiVersion": "2021-02-01-preview",
+                    "name": "[parameters('sqlDatabaseName')]",
+                    "location": "eastus",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
+                    ],
+                    "properties": {
+                        "collation": "SQL_Latin1_General_CP1_CI_AS"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Web/staticSites",
+            "apiVersion": "2021-02-01",
+            "name": "snakeGameStaticWebAppUnique",
+            "location": "eastus",
+            "properties": {
+                "repositoryUrl": "https://github.com/Manyyy20/FinalProyecto", // Cambia esto a la URL de tu repositorio
+                "branch": "main", // Cambia a la rama que quieras utilizar
+                "appLocation": "/", // Carpeta raíz de tu frontend en el repositorio
+                "apiLocation": "/api", // Ubicación del backend si está en la misma ruta, o déjalo en blanco si usas el App Service
+                "outputLocation": "dist" // Carpeta de salida de tu compilación (para frameworks como Angular o React)
+            }
+        }
+    ]
+}
