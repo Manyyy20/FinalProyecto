@@ -62,11 +62,11 @@
             "name": "snakeGameStaticWebAppUnique",
             "location": "eastus",
             "properties": {
-                "repositoryUrl": "https://github.com/Manyyy20/FinalProyecto", // Cambia esto a la URL de tu repositorio
-                "branch": "main", // Cambia a la rama que quieras utilizar
-                "appLocation": "/", // Carpeta raíz de tu frontend en el repositorio
-                "apiLocation": "/api", // Ubicación del backend si está en la misma ruta, o déjalo en blanco si usas el App Service
-                "outputLocation": "dist" // Carpeta de salida de tu compilación (para frameworks como Angular o React)
+                "repositoryUrl": "https://github.com/Manyyy20/FinalProyecto",
+                "branch": "main",
+                "appLocation": "/",
+                "apiLocation": "",
+                "outputLocation": "build"
             }
         }
     ]
