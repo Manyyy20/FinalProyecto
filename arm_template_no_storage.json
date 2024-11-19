@@ -20,7 +20,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2021-02-01",
             "name": "[parameters('appServiceName')]",
-            "location": "eastus",
+            "location": "eastus2",
             "properties": {
                 "siteConfig": {
                     "appSettings": [
@@ -36,7 +36,7 @@
             "type": "Microsoft.Sql/servers",
             "apiVersion": "2021-02-01-preview",
             "name": "[parameters('sqlServerName')]",
-            "location": "eastus",
+            "location": "eastus2",
             "properties": {
                 "administratorLogin": "sqladmin",
                 "administratorLoginPassword": "Password22"
@@ -46,7 +46,7 @@
                     "type": "databases",
                     "apiVersion": "2021-02-01-preview",
                     "name": "[parameters('sqlDatabaseName')]",
-                    "location": "eastus",
+                    "location": "eastus2",
                     "dependsOn": [
                         "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
                     ],
@@ -60,7 +60,10 @@
             "type": "Microsoft.Web/staticSites",
             "apiVersion": "2021-02-01",
             "name": "snakeGameStaticWebAppUnique",
-            "location": "eastus",
+            "location": "eastus2",
+            "sku": {
+                "name": "Free"
+            },
             "properties": {
                 "repositoryUrl": "https://github.com/Manyyy20/FinalProyecto",
                 "branch": "main",
