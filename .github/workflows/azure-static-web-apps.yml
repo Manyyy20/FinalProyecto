@@ -27,3 +27,4 @@ jobs:
           app_location: "/" # Directorio raíz de tu proyecto
           api_location: "" # Vacío si no tienes backend separado
           output_location: "build" # Carpeta generada tras compilar
+          deployment_action: 'upload'
