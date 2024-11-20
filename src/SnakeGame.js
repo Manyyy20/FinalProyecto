@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 
+// Función para generar la posición de la comida
 const generateFoodPosition = (snake) => {
     let newFood;
     do {
-        newFood = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
-    } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
+        newFood = {
+            x: Math.floor(Math.random() * 20),
+            y: Math.floor(Math.random() * 20),
+        };
+    } while (snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y));
     return newFood;
 };
 
@@ -44,29 +48,30 @@ const SnakeGame = () => {
     useEffect(() => {
         const moveSnake = () => {
             const newSnake = [...snake];
-            const head = { x: newSnake[0].x + direction.x, y: newSnake[0].y + direction.y };
+            const head = {
+                x: newSnake[0].x + direction.x,
+                y: newSnake[0].y + direction.y,
+            };
 
-            // Verificar colisión con paredes
+            // Colisión con paredes
             if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20) {
                 setIsGameOver(true);
                 return;
             }
 
-            // Verificar colisión consigo misma
-            if (newSnake.some(segment => segment.x === head.x && segment.y === head.y)) {
+            // Colisión consigo misma
+            if (newSnake.some((segment) => segment.x === head.x && segment.y === head.y)) {
                 setIsGameOver(true);
                 return;
             }
 
-            // Añadir nueva cabeza
             newSnake.unshift(head);
 
-            // Verificar si come comida
+            // Comer comida
             if (head.x === food.x && head.y === food.y) {
-                setScore(prevScore => prevScore + 1);
+                setScore((prev) => prev + 1);
                 setFood(generateFoodPosition(newSnake));
             } else {
-                // Eliminar la cola si no come
                 newSnake.pop();
             }
 
