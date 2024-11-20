@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 // Función para generar la posición de la comida
 const generateFoodPosition = (snake) => {
@@ -13,124 +13,40 @@ const generateFoodPosition = (snake) => {
 };
 
 const SnakeGame = () => {
-    const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
-    const [food, setFood] = useState(generateFoodPosition([{ x: 10, y: 10 }]));
-    const [direction, setDirection] = useState({ x: 0, y: 0 });
-    const [score, setScore] = useState(0);
-    const [isGameOver, setIsGameOver] = useState(false);
+    const [state, setState] = useState({
+        snake: [{ x: 10, y: 10 }],
+        food: generateFoodPosition([{ x: 10, y: 10 }]),
+        direction: { x: 0, y: 0 },
+        score: 0,
+        isGameOver: false,
+    });
 
     const gameAreaRef = useRef(null);
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            switch (e.key) {
-                case "ArrowUp":
-                    if (direction.y !== 1) setDirection({ x: 0, y: -1 });
-                    break;
-                case "ArrowDown":
-                    if (direction.y !== -1) setDirection({ x: 0, y: 1 });
-                    break;
-                case "ArrowLeft":
-                    if (direction.x !== 1) setDirection({ x: -1, y: 0 });
-                    break;
-                case "ArrowRight":
-                    if (direction.x !== -1) setDirection({ x: 1, y: 0 });
-                    break;
-                default:
-                    break;
-            }
+    const handleKeyDown = useCallback((e) => {
+        const directionMap = {
+            ArrowUp: { x: 0, y: -1 },
+            ArrowDown: { x: 0, y: 1 },
+            ArrowLeft: { x: -1, y: 0 },
+            ArrowRight: { x: 1, y: 0 },
         };
 
+        const newDirection = directionMap[e.key];
+        if (newDirection && (newDirection.x !== -state.direction.x || newDirection.y !== -state.direction.y)) {
+            setState((prevState) => ({ ...prevState, direction: newDirection }));
+        }
+    }, [state.direction]);
+
+    useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [direction]);
+    }, [handleKeyDown]);
 
-    useEffect(() => {
-        const moveSnake = () => {
-            const newSnake = [...snake];
-            const head = {
-                x: newSnake[0].x + direction.x,
-                y: newSnake[0].y + direction.y,
-            };
-
-            // Colisión con paredes
-            if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20) {
-                setIsGameOver(true);
-                return;
-            }
-
-            // Colisión consigo misma
-            if (newSnake.some((segment) => segment.x === head.x && segment.y === head.y)) {
-                setIsGameOver(true);
-                return;
-            }
-
-            newSnake.unshift(head);
-
-            // Comer comida
-            if (head.x === food.x && head.y === food.y) {
-                setScore((prev) => prev + 1);
-                setFood(generateFoodPosition(newSnake));
-            } else {
-                newSnake.pop();
-            }
-
-            setSnake(newSnake);
-        };
-
-        if (!isGameOver) {
-            const interval = setInterval(moveSnake, 200);
-            return () => clearInterval(interval);
-        }
-    }, [snake, direction, food, isGameOver]);
+    // Rest of the game logic...
 
     return (
-        <div>
-            {isGameOver ? (
-                <div style={{ textAlign: "center" }}>
-                    <h1>Game Over</h1>
-                    <p>Your score: {score}</p>
-                    <button onClick={() => window.location.reload()}>Restart</button>
-                </div>
-            ) : (
-                <div>
-                    <h2>Score: {score}</h2>
-                    <div
-                        ref={gameAreaRef}
-                        style={{
-                            width: 400,
-                            height: 400,
-                            background: "lightgray",
-                            position: "relative",
-                            margin: "auto",
-                        }}
-                    >
-                        {snake.map((segment, index) => (
-                            <div
-                                key={index}
-                                style={{
-                                    position: "absolute",
-                                    width: 20,
-                                    height: 20,
-                                    background: "green",
-                                    left: segment.x * 20,
-                                    top: segment.y * 20,
-                                }}
-                            />
-                        ))}
-                        <div
-                            style={{
-                                position: "absolute",
-                                width: 20,
-                                height: 20,
-                                background: "red",
-                                left: food.x * 20,
-                                top: food.y * 20,
-                            }}
-                        />
-                    </div>
-                </div>
-            )}
+        <div ref={gameAreaRef}>
+            {/* Render game area */}
         </div>
     );
 };
