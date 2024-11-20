@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 
+const generateFoodPosition = (snake) => {
+    let newFood;
+    do {
+        newFood = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
+    } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
+    return newFood;
+};
+
 const SnakeGame = () => {
     const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
     const [food, setFood] = useState(generateFoodPosition([{ x: 10, y: 10 }]));
@@ -9,16 +17,6 @@ const SnakeGame = () => {
 
     const gameAreaRef = useRef(null);
 
-    // Genera una posición válida para la comida
-    function generateFoodPosition(currentSnake) {
-        let newFood;
-        do {
-            newFood = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
-        } while (currentSnake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
-        return newFood;
-    }
-
-    // Maneja la dirección del movimiento
     useEffect(() => {
         const handleKeyDown = (e) => {
             switch (e.key) {
@@ -43,7 +41,6 @@ const SnakeGame = () => {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [direction]);
 
-    // Lógica de movimiento de la serpiente y colisiones
     useEffect(() => {
         const moveSnake = () => {
             const newSnake = [...snake];
