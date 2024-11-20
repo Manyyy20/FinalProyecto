@@ -1,55 +1,13 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import Snake from "./Snake";
-import Food from "./Food";
-import "./SnakeGame.css"; // Importamos el CSS separado
-
-const generateFoodPosition = (snake, gridSize = 20) => {
-    const grid = Array(gridSize)
-        .fill(null)
-        .flatMap((_, x) => Array(gridSize).fill(null).map((_, y) => ({ x, y })));
-
-    const freeCells = grid.filter(
-        (cell) => !snake.some((segment) => segment.x === cell.x && segment.y === cell.y)
-    );
-
-    if (freeCells.length === 0) {
-        return null; // No hay espacio disponible para generar comida
-    }
-
-    return freeCells[Math.floor(Math.random() * freeCells.length)];
-};
-
 const SnakeGame = () => {
-    const gridSize = 20; // Tamaño de la cuadrícula
-    const [snake, setSnake] = useState([{ x: 10, y: 10 }]); // Posición inicial de la serpiente
-    const [food, setFood] = useState(generateFoodPosition([{ x: 10, y: 10 }], gridSize)); // Posición inicial de la comida
-    const [direction, setDirection] = useState({ x: 1, y: 0 }); // Dirección inicial hacia la derecha
-    const [score, setScore] = useState(0); // Puntuación inicial
-    const [isGameOver, setIsGameOver] = useState(false); // Estado del juego
-    const gameAreaRef = useRef(null); // Referencia al área del juego
-
-    const handleKeyDown = useCallback((e) => {
-        const directionMap = {
-            ArrowUp: { x: 0, y: -1 },
-            ArrowDown: { x: 0, y: 1 },
-            ArrowLeft: { x: -1, y: 0 },
-            ArrowRight: { x: 1, y: 0 },
-        };
-
-        const newDirection = directionMap[e.key];
-        if (newDirection && (newDirection.x !== -direction.x || newDirection.y !== -direction.y)) {
-            setDirection(newDirection);
-        }
-    }, [direction]);
+    const gridSize = 20;
+    const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
+    const [food, setFood] = useState(generateFoodPosition([{ x: 10, y: 10 }], gridSize));
+    const [direction, setDirection] = useState({ x: 1, y: 0 }); // Dirección inicial válida
+    const [score, setScore] = useState(0);
+    const [isGameOver, setIsGameOver] = useState(false);
+    const [isGameStarted, setIsGameStarted] = useState(false);
 
     useEffect(() => {
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [handleKeyDown]);
-
-    useEffect(() => {
-        if (isGameOver) return;
-
         const interval = setInterval(() => {
             setSnake((prevSnake) => {
                 const newHead = {
@@ -57,6 +15,13 @@ const SnakeGame = () => {
                     y: (prevSnake[0].y + direction.y + gridSize) % gridSize,
                 };
 
+                // Ignorar colisiones antes de que el juego comience
+                if (!isGameStarted) {
+                    setIsGameStarted(true);
+                    return [newHead];
+                }
+
+                // Detectar colisión con el cuerpo
                 const collision = prevSnake.some(
                     (segment) => segment.x === newHead.x && segment.y === newHead.y
                 );
@@ -81,7 +46,7 @@ const SnakeGame = () => {
         }, 200);
 
         return () => clearInterval(interval);
-    }, [direction, food, isGameOver]);
+    }, [direction, food, isGameStarted, isGameOver]);
 
     return (
         <div ref={gameAreaRef} className="game-area">
@@ -94,5 +59,3 @@ const SnakeGame = () => {
         </div>
     );
 };
-
-export default SnakeGame;
