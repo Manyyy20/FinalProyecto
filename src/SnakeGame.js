@@ -1,22 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 
 const SnakeGame = () => {
     const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
-    const [food, setFood] = useState({ x: 15, y: 15 });
+    const [food, setFood] = useState(generateFoodPosition([{ x: 10, y: 10 }]));
     const [direction, setDirection] = useState({ x: 0, y: 0 });
     const [score, setScore] = useState(0);
     const [isGameOver, setIsGameOver] = useState(false);
 
     const gameAreaRef = useRef(null);
 
-    const generateFood = () => {
+    // Genera una posición válida para la comida
+    function generateFoodPosition(currentSnake) {
         let newFood;
         do {
             newFood = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
-        } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
-        setFood(newFood);
-    };
+        } while (currentSnake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
+        return newFood;
+    }
 
+    // Maneja la dirección del movimiento
     useEffect(() => {
         const handleKeyDown = (e) => {
             switch (e.key) {
@@ -41,28 +43,33 @@ const SnakeGame = () => {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [direction]);
 
+    // Lógica de movimiento de la serpiente y colisiones
     useEffect(() => {
         const moveSnake = () => {
             const newSnake = [...snake];
             const head = { x: newSnake[0].x + direction.x, y: newSnake[0].y + direction.y };
 
-            // Check for collisions with walls
+            // Verificar colisión con paredes
             if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20) {
                 setIsGameOver(true);
                 return;
             }
 
-            // Check for collisions with itself
+            // Verificar colisión consigo misma
             if (newSnake.some(segment => segment.x === head.x && segment.y === head.y)) {
                 setIsGameOver(true);
                 return;
             }
 
+            // Añadir nueva cabeza
             newSnake.unshift(head);
+
+            // Verificar si come comida
             if (head.x === food.x && head.y === food.y) {
-                setScore(score + 1);
-                generateFood();
+                setScore(prevScore => prevScore + 1);
+                setFood(generateFoodPosition(newSnake));
             } else {
+                // Eliminar la cola si no come
                 newSnake.pop();
             }
 
@@ -73,44 +80,53 @@ const SnakeGame = () => {
             const interval = setInterval(moveSnake, 200);
             return () => clearInterval(interval);
         }
-    }, [snake, direction, food, score, isGameOver]);
+    }, [snake, direction, food, isGameOver]);
 
     return (
         <div>
             {isGameOver ? (
-                <div>
+                <div style={{ textAlign: "center" }}>
                     <h1>Game Over</h1>
                     <p>Your score: {score}</p>
+                    <button onClick={() => window.location.reload()}>Restart</button>
                 </div>
             ) : (
-                <div
-                    ref={gameAreaRef}
-                    style={{ width: 400, height: 400, background: "lightgray", position: "relative" }}
-                >
-                    {snake.map((segment, index) => (
+                <div>
+                    <h2>Score: {score}</h2>
+                    <div
+                        ref={gameAreaRef}
+                        style={{
+                            width: 400,
+                            height: 400,
+                            background: "lightgray",
+                            position: "relative",
+                            margin: "auto",
+                        }}
+                    >
+                        {snake.map((segment, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    position: "absolute",
+                                    width: 20,
+                                    height: 20,
+                                    background: "green",
+                                    left: segment.x * 20,
+                                    top: segment.y * 20,
+                                }}
+                            />
+                        ))}
                         <div
-                            key={index}
                             style={{
                                 position: "absolute",
                                 width: 20,
                                 height: 20,
-                                background: "green",
-                                left: segment.x * 20,
-                                top: segment.y * 20,
+                                background: "red",
+                                left: food.x * 20,
+                                top: food.y * 20,
                             }}
                         />
-                    ))}
-                    <div
-                        style={{
-                            position: "absolute",
-                            width: 20,
-                            height: 20,
-                            background: "red",
-                            left: food.x * 20,
-                            top: food.y * 20,
-                        }}
-                    />
-                    <div>Score: {score}</div>
+                    </div>
                 </div>
             )}
         </div>
