@@ -23,7 +23,7 @@ const SnakeGame = () => {
     const gridSize = 20; // Tamaño de la cuadrícula
     const [snake, setSnake] = useState([{ x: 10, y: 10 }]); // Posición inicial de la serpiente
     const [food, setFood] = useState(generateFoodPosition([{ x: 10, y: 10 }], gridSize)); // Posición inicial de la comida
-    const [direction, setDirection] = useState({ x: 0, y: 0 }); // Dirección inicial (inactiva)
+    const [direction, setDirection] = useState({ x: 1, y: 0 }); // Dirección inicial hacia la derecha
     const [score, setScore] = useState(0); // Puntuación inicial
     const [isGameOver, setIsGameOver] = useState(false); // Estado del juego
     const gameAreaRef = useRef(null); // Referencia al área del juego
