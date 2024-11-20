@@ -1,0 +1,32 @@
+.game-area {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    background-color: #f0f0f0;
+    border: 2px solid #333;
+    margin: 20px auto;
+}
+
+.score-area {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.game-over {
+    color: red;
+    font-weight: bold;
+}
+
+.snake-segment {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: green;
+}
+
+.food {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+}

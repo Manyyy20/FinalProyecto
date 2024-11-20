@@ -1,9 +1,8 @@
-// SnakeGame.js
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Snake from "./Snake";
 import Food from "./Food";
+import "./SnakeGame.css"; // Importamos el CSS separado
 
-// Función para generar la posición de la comida
 const generateFoodPosition = (snake, gridSize = 20) => {
     const grid = Array(gridSize)
         .fill(null)
@@ -14,19 +13,20 @@ const generateFoodPosition = (snake, gridSize = 20) => {
     );
 
     if (freeCells.length === 0) {
-        return null; // No hay espacio para colocar comida
+        return null; // No hay espacio disponible para generar comida
     }
 
     return freeCells[Math.floor(Math.random() * freeCells.length)];
 };
 
 const SnakeGame = () => {
-    const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
-    const [food, setFood] = useState(generateFoodPosition([{ x: 10, y: 10 }]));
-    const [direction, setDirection] = useState({ x: 0, y: 0 });
-    const [score, setScore] = useState(0);
-    const [isGameOver, setIsGameOver] = useState(false);
-    const gameAreaRef = useRef(null);
+    const gridSize = 20; // Tamaño de la cuadrícula
+    const [snake, setSnake] = useState([{ x: 10, y: 10 }]); // Posición inicial de la serpiente
+    const [food, setFood] = useState(generateFoodPosition([{ x: 10, y: 10 }], gridSize)); // Posición inicial de la comida
+    const [direction, setDirection] = useState({ x: 0, y: 0 }); // Dirección inicial (inactiva)
+    const [score, setScore] = useState(0); // Puntuación inicial
+    const [isGameOver, setIsGameOver] = useState(false); // Estado del juego
+    const gameAreaRef = useRef(null); // Referencia al área del juego
 
     const handleKeyDown = useCallback((e) => {
         const directionMap = {
@@ -53,8 +53,8 @@ const SnakeGame = () => {
         const interval = setInterval(() => {
             setSnake((prevSnake) => {
                 const newHead = {
-                    x: (prevSnake[0].x + direction.x + 20) % 20,
-                    y: (prevSnake[0].y + direction.y + 20) % 20,
+                    x: (prevSnake[0].x + direction.x + gridSize) % gridSize,
+                    y: (prevSnake[0].y + direction.y + gridSize) % gridSize,
                 };
 
                 const collision = prevSnake.some(
@@ -71,7 +71,7 @@ const SnakeGame = () => {
 
                 if (newHead.x === food.x && newHead.y === food.y) {
                     setScore((prevScore) => prevScore + 1);
-                    setFood(generateFoodPosition(newSnake));
+                    setFood(generateFoodPosition(newSnake, gridSize));
                 } else {
                     newSnake.pop();
                 }
@@ -84,58 +84,15 @@ const SnakeGame = () => {
     }, [direction, food, isGameOver]);
 
     return (
-        <div ref={gameAreaRef} style={{ width: "400px", height: "400px", position: "relative" }}>
+        <div ref={gameAreaRef} className="game-area">
             <Snake segments={snake} />
             <Food position={food} />
-            <div>Score: {score}</div>
-            {isGameOver && <div>Game Over</div>}
+            <div className="score-area">
+                <p>Score: {score}</p>
+                {isGameOver && <p className="game-over">Game Over</p>}
+            </div>
         </div>
     );
 };
 
 export default SnakeGame;
-
-// Snake.js
-import React from "react";
-
-const Snake = ({ segments }) => {
-    return (
-        <>
-            {segments.map((segment, index) => (
-                <div
-                    key={index}
-                    style={{
-                        position: "absolute",
-                        width: "20px",
-                        height: "20px",
-                        backgroundColor: "green",
-                        top: `${segment.y * 20}px`,
-                        left: `${segment.x * 20}px`,
-                    }}
-                />
-            ))}
-        </>
-    );
-};
-
-export default Snake;
-
-// Food.js
-import React from "react";
-
-const Food = ({ position }) => {
-    return position ? (
-        <div
-            style={{
-                position: "absolute",
-                width: "20px",
-                height: "20px",
-                backgroundColor: "red",
-                top: `${position.y * 20}px`,
-                left: `${position.x * 20}px`,
-            }}
-        />
-    ) : null;
-};
-
-export default Food;
