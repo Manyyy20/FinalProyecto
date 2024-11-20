@@ -1,5 +1,5 @@
 import React from "react";
-import "./Snake.css"; // Importamos estilos específicos de Snake
+import "./SnakeGame.css"; // Importamos estilos específicos de Snake
 
 const Snake = ({ segments }) => (
     <>

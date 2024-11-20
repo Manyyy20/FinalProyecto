@@ -1,5 +1,5 @@
 import React from "react";
-import "./Food.css"; // Importamos estilos específicos de Food
+import "./SnakeGame.css"; // Importamos estilos específicos de Food
 
 const Food = ({ position }) =>
     position ? (
