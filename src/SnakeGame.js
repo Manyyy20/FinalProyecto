@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Snake from "./Snake";
 import Food from "./Food";
 import "./SnakeGame.css"; // Importar estilos CSS
