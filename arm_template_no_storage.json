@@ -4,15 +4,19 @@
     "parameters": {
         "appServiceName": {
             "type": "string",
-            "defaultValue": "snakeGameWebAppUnique"
+            "defaultValue": "snakeGameAppService"
         },
         "sqlServerName": {
             "type": "string",
-            "defaultValue": "snakeGameSqlServerUnique"
+            "defaultValue": "snakeGameSqlServer"
         },
         "sqlDatabaseName": {
             "type": "string",
-            "defaultValue": "snakeGameDBunique"
+            "defaultValue": "snakeGameDatabase"
+        },
+        "staticWebAppName": {
+            "type": "string",
+            "defaultValue": "snakeGameStaticWebApp"
         }
     },
     "resources": [
@@ -59,7 +63,7 @@
         {
             "type": "Microsoft.Web/staticSites",
             "apiVersion": "2021-02-01",
-            "name": "snakeGameStaticWebAppUnique",
+            "name": "[parameters('staticWebAppName')]",
             "location": "eastus2",
             "sku": {
                 "name": "Free"
