@@ -17,7 +17,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16' # Cambia si decides usar Node.js 18 más adelante
+          node-version: '16.x' # Asegura la versión compatible más reciente
 
       # Clona el repositorio
       - uses: actions/checkout@v2
@@ -28,6 +28,8 @@ jobs:
 
       # Construye el frontend (React)
       - name: Build Frontend
+        env:
+          NODE_OPTIONS: "--openssl-legacy-provider" # Solución para OpenSSL
         run: npm run build
 
       # Implementa el proyecto en Azure Static Web Apps
