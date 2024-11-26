@@ -27,7 +27,8 @@ const SnakeGame = () => {
     const [isGameOver, setIsGameOver] = useState(false);
     const [playerName, setPlayerName] = useState("");
 
-    const saveScore = async () => {
+    // Guardar puntaje en la base de datos
+    const saveScore = useCallback(async () => {
         try {
             const response = await fetch("https://snakegameappservice.azurewebsites.net/api/addScore", {
                 method: "POST",
@@ -43,7 +44,7 @@ const SnakeGame = () => {
         } catch (error) {
             console.error("Error saving score:", error);
         }
-    };
+    }, [playerName, score]);
 
     const handleKeyDown = useCallback((e) => {
         const directionMap = {
@@ -101,7 +102,7 @@ const SnakeGame = () => {
         }, 200);
 
         return () => clearInterval(interval);
-    }, [direction, food, isGameOver]);
+    }, [direction, food, isGameOver, saveScore]);
 
     const handleStartGame = () => {
         setIsGameOver(false);
