@@ -17,10 +17,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x' # Asegura la versión compatible más reciente
+          node-version: '16.x' # O '18.x' si necesario
 
       # Clona el repositorio
       - uses: actions/checkout@v2
+
+      # Establece el flag de OpenSSL legacy provider
+      - name: Configure OpenSSL Legacy Provider
+        run: |
+          echo 'NODE_OPTIONS="--openssl-legacy-provider"' >> $GITHUB_ENV
 
       # Instala las dependencias del frontend
       - name: Install Dependencies
@@ -28,8 +33,6 @@ jobs:
 
       # Construye el frontend (React)
       - name: Build Frontend
-        env:
-          NODE_OPTIONS: "--openssl-legacy-provider" # Solución para OpenSSL
         run: npm run build
 
       # Implementa el proyecto en Azure Static Web Apps
