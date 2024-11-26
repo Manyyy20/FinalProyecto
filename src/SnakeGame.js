@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Snake from "./Snake";
 import Food from "./Food";
-import "./SnakeGame.css"; // Importar estilos CSS
+import PlayerNameForm from "./PlayerNameForm";
+import "./SnakeGame.css";
 
 const generateFoodPosition = (snake, gridSize = 20) => {
     const grid = Array(gridSize)
@@ -12,23 +13,20 @@ const generateFoodPosition = (snake, gridSize = 20) => {
         (cell) => !snake.some((segment) => segment.x === cell.x && segment.y === cell.y)
     );
 
-    if (freeCells.length === 0) {
-        return null; // No hay espacio disponible para generar comida
-    }
-
-    return freeCells[Math.floor(Math.random() * freeCells.length)];
+    return freeCells.length > 0
+        ? freeCells[Math.floor(Math.random() * freeCells.length)]
+        : null;
 };
 
 const SnakeGame = () => {
-    const gridSize = 20; // Tamaño de la cuadrícula
+    const gridSize = 20;
     const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
     const [food, setFood] = useState(generateFoodPosition([{ x: 10, y: 10 }], gridSize));
     const [direction, setDirection] = useState({ x: 1, y: 0 });
     const [score, setScore] = useState(0);
     const [isGameOver, setIsGameOver] = useState(false);
-    const [playerName, setPlayerName] = useState(""); // Estado para el nombre del jugador
+    const [playerName, setPlayerName] = useState("");
 
-    // Guardar puntaje en la base de datos
     const saveScore = async () => {
         try {
             const response = await fetch("https://snakegameappservice.azurewebsites.net/api/addScore", {
@@ -47,22 +45,19 @@ const SnakeGame = () => {
         }
     };
 
-    const handleKeyDown = useCallback(
-        (e) => {
-            const directionMap = {
-                ArrowUp: { x: 0, y: -1 },
-                ArrowDown: { x: 0, y: 1 },
-                ArrowLeft: { x: -1, y: 0 },
-                ArrowRight: { x: 1, y: 0 },
-            };
+    const handleKeyDown = useCallback((e) => {
+        const directionMap = {
+            ArrowUp: { x: 0, y: -1 },
+            ArrowDown: { x: 0, y: 1 },
+            ArrowLeft: { x: -1, y: 0 },
+            ArrowRight: { x: 1, y: 0 },
+        };
 
-            const newDirection = directionMap[e.key];
-            if (newDirection && (newDirection.x !== -direction.x || newDirection.y !== -direction.y)) {
-                setDirection(newDirection);
-            }
-        },
-        [direction]
-    );
+        const newDirection = directionMap[e.key];
+        if (newDirection && (newDirection.x !== -direction.x || newDirection.y !== -direction.y)) {
+            setDirection(newDirection);
+        }
+    }, [direction]);
 
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
@@ -71,7 +66,7 @@ const SnakeGame = () => {
 
     useEffect(() => {
         if (isGameOver) {
-            saveScore(); // Guardar puntaje al finalizar
+            saveScore();
             return;
         }
 
@@ -109,10 +104,6 @@ const SnakeGame = () => {
     }, [direction, food, isGameOver]);
 
     const handleStartGame = () => {
-        if (!playerName.trim()) {
-            alert("Please enter your name to start the game!");
-            return;
-        }
         setIsGameOver(false);
         setScore(0);
         setSnake([{ x: 10, y: 10 }]);
@@ -129,15 +120,7 @@ const SnakeGame = () => {
                 </div>
             )}
             {!playerName && !isGameOver && (
-                <div className="player-name-input">
-                    <input
-                        type="text"
-                        placeholder="Enter your name"
-                        value={playerName}
-                        onChange={(e) => setPlayerName(e.target.value)}
-                    />
-                    <button onClick={handleStartGame}>Start Game</button>
-                </div>
+                <PlayerNameForm setPlayerName={setPlayerName} startGame={handleStartGame} />
             )}
             {playerName && !isGameOver && (
                 <>

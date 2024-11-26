@@ -1,32 +1,26 @@
-.game-area {
-    position: relative;
-    width: 400px;
-    height: 400px;
-    background-color: #f0f0f0;
-    border: 2px solid #333;
-    margin: 20px auto;
+.player-name-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
 }
 
-.score-area {
-    text-align: center;
-    margin-top: 10px;
+.player-name-input input {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #333;
+    border-radius: 5px;
 }
 
-.game-over {
-    color: red;
-    font-weight: bold;
+.player-name-input button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
-.snake-segment {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: green;
-}
-
-.food {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background-color: red;
+.player-name-input button:hover {
+    background-color: #218838;
 }
