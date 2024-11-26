@@ -26,20 +26,43 @@ const SnakeGame = () => {
     const [direction, setDirection] = useState({ x: 1, y: 0 });
     const [score, setScore] = useState(0);
     const [isGameOver, setIsGameOver] = useState(false);
+    const [playerName, setPlayerName] = useState(""); // Estado para el nombre del jugador
 
-    const handleKeyDown = useCallback((e) => {
-        const directionMap = {
-            ArrowUp: { x: 0, y: -1 },
-            ArrowDown: { x: 0, y: 1 },
-            ArrowLeft: { x: -1, y: 0 },
-            ArrowRight: { x: 1, y: 0 },
-        };
+    // Guardar puntaje en la base de datos
+    const saveScore = async () => {
+        try {
+            const response = await fetch("https://snakegameappservice.azurewebsites.net/api/addScore", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ playerName, score }),
+            });
 
-        const newDirection = directionMap[e.key];
-        if (newDirection && (newDirection.x !== -direction.x || newDirection.y !== -direction.y)) {
-            setDirection(newDirection);
+            if (response.ok) {
+                console.log("Score saved successfully.");
+            } else {
+                console.error("Failed to save score.");
+            }
+        } catch (error) {
+            console.error("Error saving score:", error);
         }
-    }, [direction]);
+    };
+
+    const handleKeyDown = useCallback(
+        (e) => {
+            const directionMap = {
+                ArrowUp: { x: 0, y: -1 },
+                ArrowDown: { x: 0, y: 1 },
+                ArrowLeft: { x: -1, y: 0 },
+                ArrowRight: { x: 1, y: 0 },
+            };
+
+            const newDirection = directionMap[e.key];
+            if (newDirection && (newDirection.x !== -direction.x || newDirection.y !== -direction.y)) {
+                setDirection(newDirection);
+            }
+        },
+        [direction]
+    );
 
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
@@ -47,7 +70,10 @@ const SnakeGame = () => {
     }, [handleKeyDown]);
 
     useEffect(() => {
-        if (isGameOver) return;
+        if (isGameOver) {
+            saveScore(); // Guardar puntaje al finalizar
+            return;
+        }
 
         const interval = setInterval(() => {
             setSnake((prevSnake) => {
@@ -82,16 +108,48 @@ const SnakeGame = () => {
         return () => clearInterval(interval);
     }, [direction, food, isGameOver]);
 
+    const handleStartGame = () => {
+        if (!playerName.trim()) {
+            alert("Please enter your name to start the game!");
+            return;
+        }
+        setIsGameOver(false);
+        setScore(0);
+        setSnake([{ x: 10, y: 10 }]);
+        setFood(generateFoodPosition([{ x: 10, y: 10 }], gridSize));
+        setDirection({ x: 1, y: 0 });
+    };
+
     return (
         <div className="game-area">
-            <Snake segments={snake} />
-            <Food position={food} />
-            <div className="score-area">
-                <p>Score: {score}</p>
-                {isGameOver && <p className="game-over">Game Over</p>}
-            </div>
+            {isGameOver && (
+                <div className="game-over-screen">
+                    <p>Game Over</p>
+                    <button onClick={handleStartGame}>Restart</button>
+                </div>
+            )}
+            {!playerName && !isGameOver && (
+                <div className="player-name-input">
+                    <input
+                        type="text"
+                        placeholder="Enter your name"
+                        value={playerName}
+                        onChange={(e) => setPlayerName(e.target.value)}
+                    />
+                    <button onClick={handleStartGame}>Start Game</button>
+                </div>
+            )}
+            {playerName && !isGameOver && (
+                <>
+                    <Snake segments={snake} />
+                    <Food position={food} />
+                    <div className="score-area">
+                        <p>Score: {score}</p>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
 
-export default SnakeGame; // Exportación por defecto
+export default SnakeGame;
