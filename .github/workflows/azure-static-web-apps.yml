@@ -13,34 +13,34 @@ jobs:
   build_and_deploy_job:
     runs-on: ubuntu-latest
     steps:
+      # Limpia el entorno
+      - name: Cleanup Workspace
+        run: |
+          rm -rf node_modules
+          rm -rf backend/node_modules
+
       # Configura la versión de Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x' # O '18.x' si necesario
+          node-version: '16'
 
       # Clona el repositorio
       - uses: actions/checkout@v2
-
-      # Establece el flag de OpenSSL legacy provider
-      - name: Configure OpenSSL Legacy Provider
-        run: |
-          echo 'NODE_OPTIONS="--openssl-legacy-provider"' >> $GITHUB_ENV
 
       # Instala las dependencias del frontend
       - name: Install Dependencies
         run: npm install
 
-      # Construye el frontend (React)
+      # Construye el frontend
       - name: Build Frontend
         run: npm run build
 
-      # Implementa el proyecto en Azure Static Web Apps
+      # Implementa el proyecto
       - name: Build And Deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          app_location: "/" # Carpeta del frontend (raíz del proyecto)
-          api_location: "backend" # Carpeta del backend
-          output_location: "build" # Carpeta de salida del frontend
-          deployment_action: 'upload'
+          app_location: "/"
+          api_location: "backend"
+          output_location: "build"
