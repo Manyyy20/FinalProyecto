@@ -44,3 +44,4 @@ jobs:
           app_location: "/"
           api_location: "backend"
           output_location: "build"
+          deployment_action: 'upload'
