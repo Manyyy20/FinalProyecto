@@ -51,3 +51,4 @@ jobs:
           app_location: "/" # Carpeta del frontend (raíz del proyecto)
           api_location: "backend" # Carpeta del backend
           output_location: "build" # Carpeta de salida del build del frontend
+          deployment_action: "upload" # Acción de despliegue
