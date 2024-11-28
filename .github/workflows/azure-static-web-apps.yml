@@ -40,6 +40,7 @@ jobs:
     - name: Deploy to Azure Static Web Apps
       uses: Azure/static-web-apps-deploy@v1
       with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
         app_location: "/"
         api_location: "backend"
         output_location: "build" # Specify the correct build output location if different
@@ -52,3 +53,4 @@ jobs:
         slot-name: production
         publish-profile: ${{ secrets.AZURE_WEBAPPS_PUBLISH_PROFILE }}
         package: ./backend
+
