@@ -43,6 +43,7 @@ jobs:
         app_location: "/"
         api_location: "backend"
         output_location: "build" # Specify the correct build output location if different
+        deployment_action: "upload"
 
     - name: Deploy backend to Azure Web App
       uses: azure/webapps-deploy@v2
