@@ -7,10 +7,10 @@ const port = process.env.PORT || 3000;
 
 // Configuración de la base de datos
 const dbConfig = {
-    user: "sqladmin",
-    password: "Password22",
-    server: "snakegamesqlserver.database.windows.net",
-    database: "snakeGameDatabase",
+    user: process.env.DB_USER || "sqladmin",
+    password: process.env.DB_PASSWORD || "Password22",
+    server: process.env.DB_SERVER || "snakegamesqlserver.database.windows.net",
+    database: process.env.DB_DATABASE || "snakeGameDatabase",
     options: {
         encrypt: true,
     },

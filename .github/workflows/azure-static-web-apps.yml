@@ -4,62 +4,50 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - main
 
 jobs:
-  build_and_deploy_job:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Limpieza previa del entorno
-      - name: Clean Workspace
-        run: |
-          rm -rf node_modules
-          rm -rf backend/node_modules
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      # Clona el repositorio
-      - name: Checkout Code
-        uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
 
-      # Configura Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16.x' # Cambia a '18.x' si es necesario
+    - name: Set NODE_OPTIONS for OpenSSL
+      env:
+        NODE_OPTIONS: "--openssl-legacy-provider"
+      run: echo "OpenSSL legacy provider configured"
 
-      # Configura OpenSSL Legacy Provider de forma explícita
-      - name: Set NODE_OPTIONS for OpenSSL
-        env:
-          NODE_OPTIONS: "--openssl-legacy-provider"
-        run: echo "OpenSSL legacy provider configured"
+    - name: Install frontend dependencies
+      run: npm ci
 
-      # Instala las dependencias del frontend
-      - name: Install Frontend Dependencies
-        run: npm ci
+    - name: Build frontend
+      run: npm run build
 
-      # Construye el proyecto
-      - name: Build Frontend
-        run: npm run build
+    - name: Install backend dependencies
+      working-directory: ./backend
+      run: npm ci
 
-      # Verifica problemas en el backend antes del despliegue
-      - name: Install Backend Dependencies
-        working-directory: ./backend
-        run: npm ci
+    - name: Test backend
+      working-directory: ./backend
+      run: npm test || echo "No backend tests defined, skipping"
 
-      - name: Test Backend
-        working-directory: ./backend
-        run: npm test || echo "No backend tests defined, skipping"
+    - name: Deploy to Azure Static Web Apps
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        app_location: "/"
+        api_location: "backend"
+        output_location: "build" # Specify the correct build output location if different
 
-      # Despliega el proyecto en Azure
-      - name: Deploy to Azure
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          app_location: "/" # Carpeta del frontend (raíz del proyecto)
-          api_location: "backend" # Carpeta del backend
-          output_location: "build" # Carpeta de salida del build del frontend
-          deployment_action: "upload"
-#Test never give up
+    - name: Deploy backend to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: snakeGameAppService
+        slot-name: production
+        publish-profile: ${{ secrets.AZURE_WEBAPPS_PUBLISH_PROFILE }}
+        package: ./backend
