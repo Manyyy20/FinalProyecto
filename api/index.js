@@ -11,9 +11,7 @@ const dbConfig = {
     password: process.env.DB_PASSWORD || "Password22",
     server: process.env.DB_SERVER || "snakegamesqlserver.database.windows.net",
     database: process.env.DB_DATABASE || "snakeGameDatabase",
-    options: {
-        encrypt: true,
-    },
+    options: { encrypt: true },
 };
 
 // Middleware
@@ -44,6 +42,5 @@ app.post("/api/addScore", async (req, res) => {
 
 // Iniciar el servidor
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`API running on port ${port}`);
 });
-//test//test//Test
