@@ -33,11 +33,11 @@ jobs:
       working-directory: ./
 
     - name: Install backend dependencies
-      working-directory: ./backend
+      working-directory: ./api
       run: npm install
 
     - name: Test backend
-      working-directory: ./backend
+      working-directory: ./api
       run: npm test || echo "No backend tests defined, skipping"
 
     - name: Deploy to Azure Static Web Apps
