@@ -17,30 +17,30 @@ module.exports = async function (context, req) {
         server: process.env.DB_SERVER || "snakegamesqlserver.database.windows.net",
         database: process.env.DB_DATABASE || "snakeGameDatabase",
         options: {
-            encrypt: true, // Importante para Azure SQL
+            encrypt: true, // Important for Azure SQL
         },
     };
 
     try {
-        // Conectar a la base de datos
+        context.log("Connecting to the database...");
         const pool = await sql.connect(dbConfig);
+        context.log("Database connection successful");
 
-        // Insertar el puntaje en la base de datos
         await pool
             .request()
             .input("PlayerName", sql.NVarChar, playerName)
             .input("Score", sql.Int, score)
-            .query("INSERT INTO Scores (PlayerName, Score, Timestamp) VALUES (@PlayerName, @Score, GETDATE())");
+            .query("INSERT INTO Scores (PlayerName, Score) VALUES (@PlayerName, @Score)");
 
         context.res = {
             status: 200,
             body: "Score added successfully",
         };
     } catch (error) {
-        console.error("Error adding score:", error);
+        context.log("Error adding score:", error.message, error.stack);
         context.res = {
             status: 500,
-            body: `Error adding score: ${error.message}`,
+            body: "Error adding score",
         };
     }
 };
