@@ -5,6 +5,7 @@ import "./SnakeGame.css";
 
 const gridSize = 20;
 
+// Genera una nueva posición para la comida
 const generateFoodPosition = (snake, gridSize) => {
     const isPositionOccupied = (position) => {
         return snake.some(segment => segment.x === position.x && segment.y === position.y);
@@ -21,7 +22,6 @@ const generateFoodPosition = (snake, gridSize) => {
     return newFood;
 };
 
-
 const SnakeGame = ({ playerName }) => {
     const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
     const [food, setFood] = useState(generateFoodPosition([{ x: 10, y: 10 }], gridSize));
@@ -29,33 +29,40 @@ const SnakeGame = ({ playerName }) => {
     const [score, setScore] = useState(0);
     const [isGameOver, setIsGameOver] = useState(false);
 
+    // Función para guardar el puntaje
     const saveScore = useCallback(async () => {
         try {
-            await fetch("https://snakegameappservice.azurewebsites.net/api/addScore", {
+            const response = await fetch("https://snakegameappservice.azurewebsites.net/api/addScore", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ playerName, score }),
             });
-            // Handle response if needed
+
+            if (response.ok) {
+                console.log("Score saved successfully.");
+            } else {
+                console.error("Failed to save score:", await response.text());
+            }
         } catch (error) {
             console.error("Error saving score:", error);
         }
     }, [playerName, score]);
 
+    // Maneja las teclas para cambiar la dirección de la serpiente
     useEffect(() => {
         const handleKeyDown = (e) => {
             switch (e.key) {
                 case "ArrowUp":
-                    setDirection({ x: 0, y: -1 });
+                    if (direction.y !== 1) setDirection({ x: 0, y: -1 });
                     break;
                 case "ArrowDown":
-                    setDirection({ x: 0, y: 1 });
+                    if (direction.y !== -1) setDirection({ x: 0, y: 1 });
                     break;
                 case "ArrowLeft":
-                    setDirection({ x: -1, y: 0 });
+                    if (direction.x !== 1) setDirection({ x: -1, y: 0 });
                     break;
                 case "ArrowRight":
-                    setDirection({ x: 1, y: 0 });
+                    if (direction.x !== -1) setDirection({ x: 1, y: 0 });
                     break;
                 default:
                     break;
@@ -64,14 +71,16 @@ const SnakeGame = ({ playerName }) => {
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, []);
+    }, [direction]);
 
+    // Guarda el puntaje cuando el juego termina
     useEffect(() => {
         if (isGameOver) {
             saveScore();
         }
     }, [isGameOver, saveScore]);
 
+    // Lógica principal del juego
     useEffect(() => {
         const interval = setInterval(() => {
             setSnake((prevSnake) => {
@@ -80,6 +89,7 @@ const SnakeGame = ({ playerName }) => {
                     y: prevSnake[0].y + direction.y,
                 };
 
+                // Verifica si el juego termina
                 if (
                     newHead.x < 0 ||
                     newHead.y < 0 ||
@@ -94,6 +104,7 @@ const SnakeGame = ({ playerName }) => {
 
                 const newSnake = [newHead, ...prevSnake];
 
+                // Verifica si la serpiente comió la comida
                 if (newHead.x === food.x && newHead.y === food.y) {
                     setScore((prevScore) => prevScore + 10);
                     setFood(generateFoodPosition(newSnake, gridSize));
@@ -108,6 +119,7 @@ const SnakeGame = ({ playerName }) => {
         return () => clearInterval(interval);
     }, [direction, food]);
 
+    // Reinicia el juego
     const handleRestart = () => {
         setSnake([{ x: 10, y: 10 }]);
         setFood(generateFoodPosition([{ x: 10, y: 10 }], gridSize));
