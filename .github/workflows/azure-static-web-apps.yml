@@ -54,4 +54,4 @@ jobs:
       with:
         app-name: "snakeGameAppService" # Cambia esto al nombre de tu App Service
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-        package: ./backend
+        package: ./api
