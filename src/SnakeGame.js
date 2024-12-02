@@ -32,7 +32,7 @@ const SnakeGame = ({ playerName }) => {
     // Función para guardar el puntaje
     const saveScore = useCallback(async () => {
         try {
-            const response = await fetch("https://functionfunk.azurewebsites.net/api/addscore", {
+            const response = await fetch("/api/addscore", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ playerName, score }),
