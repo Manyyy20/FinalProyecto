@@ -16,7 +16,18 @@
         },
         "functionAppName": {
             "type": "string",
-            "defaultValue": "snakeGameFunctionApp"
+            "defaultValue": "functionfunk"
+        },
+        "hostingPlanName": {
+            "type": "string",
+            "defaultValue": "FunctionAppHostingPlan"
+        },
+        "environmentVariables": {
+            "type": "object",
+            "defaultValue": {
+                "SQL_CONNECTION": "Your_Connection_String",
+                "ANOTHER_VARIABLE": "Another_Value"
+            }
         }
     },
     "resources": [
@@ -45,6 +56,42 @@
             ]
         },
         {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-03-01",
+            "name": "[parameters('functionAppName')]",
+            "location": "eastus2",
+            "properties": {
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "node"
+                        },
+                        {
+                            "name": "WEBSITE_NODE_DEFAULT_VERSION",
+                            "value": "~20"
+                        },
+                        {
+                            "name": "WEBSITE_RUN_FROM_PACKAGE",
+                            "value": "1"
+                        },
+                        {
+                            "name": "SQL_CONNECTION",
+                            "value": "[parameters('environmentVariables').SQL_CONNECTION]"
+                        },
+                        {
+                            "name": "ANOTHER_VARIABLE",
+                            "value": "[parameters('environmentVariables').ANOTHER_VARIABLE]"
+                        }
+                    ]
+                }
+            },
+            "kind": "functionapp",
+            "identity": {
+                "type": "SystemAssigned"
+            }
+        },
+        {
             "type": "Microsoft.Web/staticSites",
             "apiVersion": "2021-02-01",
             "name": "[parameters('staticWebAppName')]",
@@ -59,40 +106,24 @@
                 "apiLocation": "api",
                 "outputLocation": "build"
             }
-        },
-        {
-            "type": "Microsoft.Web/sites",
-            "apiVersion": "2021-02-01",
-            "name": "[parameters('functionAppName')]",
-            "location": "eastus2",
-            "kind": "functionapp,linux",
-            "properties": {
-                "siteConfig": {
-                    "appSettings": [
-                        {
-                            "name": "FUNCTIONS_EXTENSION_VERSION",
-                            "value": "~4"
-                        },
-                        {
-                            "name": "FUNCTIONS_WORKER_RUNTIME",
-                            "value": "node"
-                        },
-                        {
-                            "name": "WEBSITE_RUN_FROM_PACKAGE",
-                            "value": "1"
-                        },
-                        {
-                            "name": "SQL_CONNECTION",
-                            "value": "Server=tcp:[parameters('sqlServerName')].database.windows.net,1433;Initial Catalog=[parameters('sqlDatabaseName')];Persist Security Info=False;User ID=sqladmin;Password=Password22;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-                        }
-                    ]
-                },
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', 'FunctionAppHostingPlan')]"
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]",
-                "[resourceId('Microsoft.Web/staticSites', parameters('staticWebAppName'))]"
-            ]
         }
-    ]
+    ],
+    "outputs": {
+        "sqlServerName": {
+            "type": "string",
+            "value": "[parameters('sqlServerName')]"
+        },
+        "sqlDatabaseName": {
+            "type": "string",
+            "value": "[parameters('sqlDatabaseName')]"
+        },
+        "staticWebAppName": {
+            "type": "string",
+            "value": "[parameters('staticWebAppName')]"
+        },
+        "functionAppName": {
+            "type": "string",
+            "value": "[parameters('functionAppName')]"
+        }
+    }
 }

@@ -1,23 +1,20 @@
 #!/bin/bash
 
-# Variables declaradas
 RESOURCE_GROUP="ProyectoFinal2"
 ARM_TEMPLATE="arm_template_no_storage.json"
-GITHUB_REPO="Manyyy20/FinalProyecto"
 STATIC_WEB_APP_NAME="snakeGameStaticWebApp"
-FUNCTION_APP_NAME="snakeGameFunctionApp"
+FUNCTION_APP_NAME="functionfunk"
 
-# Desplegar el template ARM
-echo "Desplegando recursos con el ARM Template..."
+# Desplegar recursos con ARM Template
+echo "Desplegando recursos con ARM Template..."
 az deployment group create --resource-group $RESOURCE_GROUP --template-file $ARM_TEMPLATE
 
-# Verificar si el despliegue fue exitoso
 if [ $? -ne 0 ]; then
-    echo "Error: El despliegue con el ARM Template falló."
+    echo "Error: El despliegue con ARM Template falló."
     exit 1
 fi
 
-# Configurar CORS para SQL Server
+# Configurar CORS en SQL Server
 echo "Configurando CORS en el SQL Server..."
 az sql server firewall-rule create \
     --resource-group $RESOURCE_GROUP \
@@ -26,38 +23,35 @@ az sql server firewall-rule create \
     --start-ip-address 0.0.0.0 \
     --end-ip-address 0.0.0.0
 
-# Configurar CORS en Function App
-echo "Configurando CORS en Function App..."
-az functionapp cors add \
-    --resource-group $RESOURCE_GROUP \
-    --name $FUNCTION_APP_NAME \
-    --allowed-origins "https://$STATIC_WEB_APP_NAME.z23.web.core.windows.net"
+# Publicar la Function App
+echo "Publicando Function App..."
+cd api
+func azure functionapp publish $FUNCTION_APP_NAME --node
+if [ $? -ne 0 ]; then
+    echo "Error: No se pudo publicar la Function App."
+    exit 1
+fi
+cd ..
 
-# Ejecutar el script SQL para crear la tabla Scores
-echo "Creando tabla Scores en la base de datos..."
-az sql db query -g $RESOURCE_GROUP -s snakeGameSqlServer -n snakeGameDatabase --query-file create_table_scores.sql
+# Configurar variables de entorno para Function App
+echo "Configurando variables de entorno..."
+az functionapp config appsettings set --name $FUNCTION_APP_NAME --resource-group $RESOURCE_GROUP --settings "SQL_CONNECTION=Your_Connection_String" "ANOTHER_VARIABLE=Another_Value"
 
 if [ $? -ne 0 ]; then
-    echo "Error: No se pudo crear la tabla Scores."
+    echo "Error: No se pudieron configurar las variables de entorno."
     exit 1
 fi
 
-# Obtener el Deployment Token de Static Web App
+# Configurar el Deployment Token en GitHub
 echo "Obteniendo Deployment Token..."
 DEPLOYMENT_TOKEN=$(az staticwebapp secrets list --name $STATIC_WEB_APP_NAME --resource-group $RESOURCE_GROUP --query "properties.apiKey" -o tsv)
 
-# Guardar el token como secreto en GitHub
-echo "Guardando el Deployment Token como secreto en GitHub..."
-gh secret set AZURE_STATIC_WEB_APPS_API_TOKEN -b "$DEPLOYMENT_TOKEN" -R $GITHUB_REPO
+echo "Guardando Deployment Token en GitHub..."
+gh secret set AZURE_STATIC_WEB_APPS_API_TOKEN -b "$DEPLOYMENT_TOKEN" -R Manyyy20/FinalProyecto
 
 if [ $? -ne 0 ]; then
     echo "Error: No se pudo agregar el secreto en GitHub."
     exit 1
 fi
 
-# Desplegar código de Function App
-echo "Desplegando Function App..."
-func azure functionapp publish $FUNCTION_APP_NAME
-
-# Confirmación final
-echo "Despliegue completado correctamente. Revisa el workflow de GitHub Actions para el build."
+echo "Despliegue completado exitosamente."
