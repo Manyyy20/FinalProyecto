@@ -10,27 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
+      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js
+      # Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
 
-      # Step 3: Install frontend dependencies
+      # Install frontend dependencies
       - name: Install frontend dependencies
         run: npm install
         working-directory: ./
 
-      # Step 4: Build frontend
+      # Build frontend
       - name: Build frontend
         run: npm run build
         working-directory: ./
 
-      # Step 5: Deploy to Azure Static Web Apps
+      # Deploy frontend and API
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
