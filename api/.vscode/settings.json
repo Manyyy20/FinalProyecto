@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/b4654d73-928d-4aad-b096-49e3e8bff970/resourceGroups/ProyectoFinal2/providers/Microsoft.Web/sites/snakeGameAppService",
+    "appService.deploySubpath": "."
+}

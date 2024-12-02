@@ -1,9 +1,16 @@
 const express = require("express");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const sql = require("mssql");
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Configurar CORS
+app.use(cors());
+
+// Middleware
+app.use(bodyParser.json());
 
 // Configuración de la base de datos
 const dbConfig = {
@@ -11,11 +18,10 @@ const dbConfig = {
     password: process.env.DB_PASSWORD || "Password22",
     server: process.env.DB_SERVER || "snakegamesqlserver.database.windows.net",
     database: process.env.DB_DATABASE || "snakeGameDatabase",
-    options: { encrypt: true },
+    options: {
+        encrypt: true,
+    },
 };
-
-// Middleware
-app.use(bodyParser.json());
 
 // Endpoint para agregar puntaje
 app.post("/api/addScore", async (req, res) => {
@@ -27,8 +33,7 @@ app.post("/api/addScore", async (req, res) => {
 
     try {
         const pool = await sql.connect(dbConfig);
-        await pool
-            .request()
+        await pool.request()
             .input("playerName", sql.NVarChar, playerName)
             .input("score", sql.Int, score)
             .query("INSERT INTO Scores (PlayerName, Score) VALUES (@playerName, @score)");
@@ -40,7 +45,6 @@ app.post("/api/addScore", async (req, res) => {
     }
 });
 
-// Iniciar el servidor
 app.listen(port, () => {
-    console.log(`API running on port ${port}`);
+    console.log(`Server running on port ${port}`);
 });
