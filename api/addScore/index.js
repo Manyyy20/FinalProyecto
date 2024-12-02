@@ -12,7 +12,7 @@ module.exports = async function (context, req) {
                 server: process.env.DB_SERVER || "snakegamesqlserver.database.windows.net",
                 database: process.env.DB_DATABASE || "snakeGameDatabase",
                 options: {
-                    encrypt: true, // Importante para Azure SQL
+                    encrypt: true,
                 },
             });
 
@@ -27,9 +27,10 @@ module.exports = async function (context, req) {
                 body: { message: "Score saved successfully", result: result },
             };
         } catch (err) {
+            context.log.error('SQL error', err);
             context.res = {
                 status: 500,
-                body: { error: err.message },
+                body: { error: `Internal Server Error: ${err.message}` },
             };
         }
     } else {
