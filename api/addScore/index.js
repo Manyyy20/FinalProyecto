@@ -2,29 +2,27 @@ const cors = require("cors");
 const express = require("express");
 const bodyParser = require("body-parser");
 const sql = require("mssql");
-require("dotenv").config(); // Carga las variables de entorno desde el archivo .env
 
 const app = express();
 
 // Configurar CORS
 const corsOptions = {
-    origin: "https://polite-field-0707b590f.5.azurestaticapps.net", // Cambia esta URL si es necesario
-    methods: ["GET", "POST"], // Métodos permitidos
-    allowedHeaders: ["Content-Type"], // Encabezados permitidos
+    origin: "https://polite-field-0707b590f.5.azurestaticapps.net",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
 };
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-// Configuración de la base de datos usando la cadena de conexión
+// Configuración de la base de datos usando la variable de entorno generada por Azure
 const dbConfig = {
-    connectionString: process.env.DB_CONNECTION_STRING,
+    connectionString: process.env.CONNECTION_STRING, // Automáticamente asignado por Azure Static Web Apps
     options: {
-        encrypt: true, // Habilita la encriptación
+        encrypt: true,
     },
 };
 
-// Ruta para manejar la solicitud
 app.post("/api/addScore", async (req, res) => {
     const { playerName, score } = req.body;
 
@@ -33,10 +31,7 @@ app.post("/api/addScore", async (req, res) => {
     }
 
     try {
-        // Conectar a la base de datos
         const pool = await sql.connect(dbConfig);
-
-        // Insertar el puntaje en la base de datos
         await pool.request()
             .input("PlayerName", sql.NVarChar, playerName)
             .input("Score", sql.Int, score)
@@ -49,7 +44,6 @@ app.post("/api/addScore", async (req, res) => {
     }
 });
 
-// Iniciar el servidor
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
