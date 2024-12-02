@@ -1,10 +1,9 @@
 {
-  "routes": [
-    {
-      "route": "/api/*",
-      "allowedRoles": [
-        "anonymous"
-      ]
+  "configuration": {
+    "appSettings": {
+      "SQL_CONNECTION": "Server=tcp:snakegamesqlserver.database.windows.net,1433;Initial Catalog=snakeGameDatabase;Persist Security Info=False;User ID=sqladmin;Password=Password22;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+      "DB_USER": "sqladmin",
+      "DB_PASSWORD": "Password22"
     }
-  ]
+  }
 }
