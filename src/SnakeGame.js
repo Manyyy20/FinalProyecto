@@ -7,12 +7,19 @@ const gridSize = 20;
 
 const generateFoodPosition = (snake, gridSize) => {
     let newFood;
-    do {
+
+    while (true) {
         newFood = {
             x: Math.floor(Math.random() * gridSize),
             y: Math.floor(Math.random() * gridSize),
         };
-    } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
+
+        // Verifica si la posición generada está ocupada por la serpiente
+        if (!snake.some(segment => segment.x === newFood.x && segment.y === newFood.y)) {
+            break; // Sale del bucle si la posición es válida
+        }
+    }
+
     return newFood;
 };
 
