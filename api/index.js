@@ -1,17 +1,14 @@
-const express = require("express");
 const cors = require("cors");
+const express = require("express");
 const bodyParser = require("body-parser");
 const sql = require("mssql");
 
 const app = express();
-const port = process.env.PORT || 3000;
 
 // Configurar CORS
 app.use(cors());
-
-// Middleware
 app.use(bodyParser.json());
-//test
+
 // Configuración de la base de datos
 const dbConfig = {
     user: process.env.DB_USER || "sqladmin",
@@ -23,7 +20,7 @@ const dbConfig = {
     },
 };
 
-// Endpoint para agregar puntaje
+// Ruta para manejar la solicitud
 app.post("/api/addScore", async (req, res) => {
     const { playerName, score } = req.body;
 
@@ -45,6 +42,8 @@ app.post("/api/addScore", async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+// Exportar como una función de Azure
+module.exports = async function (context, req) {
+    const expressApp = app;
+    expressApp(req, context.res);
+};
