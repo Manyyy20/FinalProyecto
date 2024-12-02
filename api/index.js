@@ -2,21 +2,13 @@ const cors = require("cors");
 const express = require("express");
 const bodyParser = require("body-parser");
 const sql = require("mssql");
-const fs = require("fs");
 
-// Leer configuración de la base de datos desde el archivo staticwebapp.database.config.json
-const dbConfigFile = "./staticwebapp.database.config.json";
-let dbConfigData;
-try {
-    dbConfigData = JSON.parse(fs.readFileSync(dbConfigFile, "utf8"));
-} catch (error) {
-    console.error("Error al leer el archivo de configuración de la base de datos:", error);
-    process.exit(1); // Salir si no se puede leer la configuración
-}
-
-// Configuración de la conexión a la base de datos
+// Configuración de la conexión a la base de datos desde variables de entorno
 const dbConfig = {
-    connectionString: dbConfigData.connections.default.connectionString,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    server: process.env.DB_SERVER,
+    database: process.env.DB_DATABASE,
     options: {
         encrypt: true, // Asegura que la conexión esté encriptada
     },
@@ -27,7 +19,7 @@ const app = express();
 
 // Configurar CORS
 const corsOptions = {
-    origin: "https://polite-field-0707b590f.5.azurestaticapps.net", // Cambia esta URL a la de tu Static Web App
+    origin: "https://snakegameappservice.azurewebsites.net", // Cambia esta URL al dominio de tu App Service
     methods: ["GET", "POST"], // Métodos permitidos
     allowedHeaders: ["Content-Type"], // Encabezados permitidos
 };
@@ -64,7 +56,6 @@ app.post("/api/addScore", async (req, res) => {
         res.status(500).send(`Error adding score: ${error.message}`);
     }
 });
-
 
 // Iniciar el servidor
 const port = process.env.PORT || 3000;
