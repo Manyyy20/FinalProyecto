@@ -25,26 +25,40 @@ const dbConfig = {
         encrypt: true,
     },
 };
-//test
+
 // Ruta para manejar la solicitud
 app.post("/api/addScore", async (req, res) => {
     const { playerName, score } = req.body;
 
-    if (!playerName || !score) {
-        return res.status(400).send("playerName and score are required");
+    // Validar los datos de entrada
+    if (!playerName || typeof playerName !== "string" || !score || typeof score !== "number") {
+        return res.status(400).send("Invalid input. 'playerName' must be a string and 'score' must be a number.");
     }
 
     try {
         // Conectar a la base de datos
-        await sql.connect(dbConfig);
+        const pool = await sql.connect(dbConfig);
 
-        // Insertar el puntaje en la base de datos
-        const result = await sql.query`INSERT INTO Scores (PlayerName, Score) VALUES (${playerName}, ${score})`;
+        // Ejecutar la consulta
+        const result = await pool.request()
+            .input("playerName", sql.NVarChar, playerName)
+            .input("score", sql.Int, score)
+            .query("INSERT INTO Scores (PlayerName, Score) VALUES (@playerName, @score)");
 
+        console.log("Result from database:", result);
         res.status(200).send("Score added successfully");
     } catch (error) {
-        console.error("Error adding score:", error);
-        res.status(500).send("Error adding score");
+        // Capturar errores específicos
+        if (error.code === "ETIMEOUT") {
+            console.error("Database connection timed out:", error);
+            res.status(500).send("Database connection timed out");
+        } else if (error.code === "ELOGIN") {
+            console.error("Invalid database credentials:", error);
+            res.status(500).send("Invalid database credentials");
+        } else {
+            console.error("Error adding score:", error);
+            res.status(500).send("An unexpected error occurred while adding the score");
+        }
     }
 });
 
