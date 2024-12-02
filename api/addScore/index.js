@@ -25,7 +25,7 @@ const dbConfig = {
         encrypt: true,
     },
 };
-
+//test
 // Ruta para manejar la solicitud
 app.post("/api/addScore", async (req, res) => {
     const { playerName, score } = req.body;
