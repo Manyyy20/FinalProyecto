@@ -1,5 +1,17 @@
 {
-    "platform": {
-        "nodeVersion": "16.20.0"
+  "platform": {
+    "nodeVersion": "16.20.0"
+  },
+  "routes": [
+    {
+      "route": "/api/addScore",
+      "methods": [
+        "post",
+        "get"
+      ],
+      "allowedRoles": [
+        "anonymous"
+      ]
     }
+  ]
 }
