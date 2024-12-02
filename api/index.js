@@ -16,7 +16,7 @@ const dbConfig = {
 
 // Inicializar Express
 const app = express();
-
+//test
 // Configurar CORS
 const corsOptions = {
     origin: "https://snakegameappservice.azurewebsites.net", // Cambia esta URL al dominio de tu App Service
