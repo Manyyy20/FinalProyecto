@@ -6,22 +6,21 @@ import "./SnakeGame.css";
 const gridSize = 20;
 
 const generateFoodPosition = (snake, gridSize) => {
-    let newFood;
+    const isPositionOccupied = (position) => {
+        return snake.some(segment => segment.x === position.x && segment.y === position.y);
+    };
 
-    while (true) {
+    let newFood;
+    do {
         newFood = {
             x: Math.floor(Math.random() * gridSize),
             y: Math.floor(Math.random() * gridSize),
         };
-
-        // Verifica si la posición generada está ocupada por la serpiente
-        if (!snake.some(segment => segment.x === newFood.x && segment.y === newFood.y)) {
-            break; // Sale del bucle si la posición es válida
-        }
-    }
+    } while (isPositionOccupied(newFood));
 
     return newFood;
 };
+
 
 const SnakeGame = ({ playerName }) => {
     const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
@@ -37,12 +36,7 @@ const SnakeGame = ({ playerName }) => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ playerName, score }),
             });
-
-            if (response.ok) {
-                console.log("Score saved successfully.");
-            } else {
-                console.error("Failed to save score:", await response.text());
-            }
+            // Handle response if needed
         } catch (error) {
             console.error("Error saving score:", error);
         }
