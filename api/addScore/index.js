@@ -45,15 +45,25 @@ app.post("/api/addScore", async (req, res) => {
 
     try {
         // Conectar a la base de datos
-        await sql.connect(dbConfig);
+        const pool = await sql.connect(dbConfig);
+
+        // Verificar conexión
+        console.log("Conexión a la base de datos establecida");
 
         // Insertar el puntaje en la base de datos
-        const result = await sql.query`INSERT INTO Scores (PlayerName, Score, Timestamp) VALUES (${playerName}, ${score}, GETDATE())`;
+        const result = await pool
+            .request()
+            .input("PlayerName", sql.NVarChar, playerName)
+            .input("Score", sql.Int, score)
+            .query(
+                "INSERT INTO Scores (PlayerName, Score, Timestamp) VALUES (@PlayerName, @Score, GETDATE())"
+            );
 
+        console.log("Resultado de la inserción:", result);
         res.status(200).send("Score added successfully");
     } catch (error) {
-        console.error("Error adding score:", error);
-        res.status(500).send("Error adding score");
+        console.error("Error al agregar el puntaje:", error.message);
+        res.status(500).send(`Error adding score: ${error.message}`);
     }
 });
 
