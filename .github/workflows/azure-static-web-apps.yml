@@ -38,4 +38,5 @@ jobs:
           app_location: "/"
           api_location: "api"
           output_location: "build"
+          data_api_location: "api" # Aquí especificas la carpeta donde estará el archivo de configuración
           deployment_action: "upload"
