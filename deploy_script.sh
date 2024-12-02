@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Variables declaradas en el template ARM
+# Variables declaradas
 RESOURCE_GROUP="ProyectoFinal2"
 ARM_TEMPLATE="arm_template_no_storage.json"
 GITHUB_REPO="Manyyy20/FinalProyecto"
-STATIC_WEB_APP_NAME="snakeGameStaticWebApp" # Declarado en el template ARM
+STATIC_WEB_APP_NAME="snakeGameStaticWebApp"
 
 # Desplegar el template ARM
 echo "Desplegando recursos con el ARM Template..."
@@ -16,8 +16,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Obtener el Deployment Token
-echo "Obteniendo Deployment Token de la Static Web App..."
+# Obtener el Deployment Token de Static Web App
+echo "Obteniendo Deployment Token..."
 DEPLOYMENT_TOKEN=$(az staticwebapp secrets list --name $STATIC_WEB_APP_NAME --resource-group $RESOURCE_GROUP --query "properties.apiKey" -o tsv)
 
 # Verificar si el token fue obtenido correctamente
@@ -26,8 +26,8 @@ if [ -z "$DEPLOYMENT_TOKEN" ]; then
     exit 1
 fi
 
-# Agregar el token como secreto en GitHub
-echo "Guardando el token como secreto en GitHub..."
+# Guardar el token como secreto en GitHub
+echo "Guardando el Deployment Token como secreto en GitHub..."
 gh secret set AZURE_STATIC_WEB_APPS_API_TOKEN -b "$DEPLOYMENT_TOKEN" -R $GITHUB_REPO
 
 # Verificar si el secreto fue agregado correctamente
@@ -39,4 +39,4 @@ else
 fi
 
 # Confirmación final
-echo "Despliegue completado correctamente. Revisa el workflow de GitHub Actions para verificar el build."
+echo "Despliegue completado correctamente. Revisa el workflow de GitHub Actions para el build."

@@ -72,7 +72,7 @@
                 "repositoryUrl": "https://github.com/Manyyy20/FinalProyecto",
                 "branch": "main",
                 "appLocation": "/",
-                "apiLocation": "",
+                "apiLocation": "api",
                 "outputLocation": "build"
             }
         }

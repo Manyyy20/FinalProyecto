@@ -6,42 +6,36 @@ on:
       - main
 
 jobs:
-  build_and_deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Descarga el código del repositorio
+      # Step 1: Checkout code
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      # Configuración de Node.js para instalar dependencias
+      # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
 
-      # Instalar dependencias del frontend
+      # Step 3: Install frontend dependencies
       - name: Install frontend dependencies
         run: npm install
         working-directory: ./
 
-      # Construir el frontend
+      # Step 4: Build frontend
       - name: Build frontend
         run: npm run build
         working-directory: ./
 
-      # Subir archivos necesarios para la aplicación
-      - name: Deploy action upload
-        uses: actions/upload-artifact@v2
-        with:
-          name: Frontend Build Artifacts
-          path: build/
-
-      # Deploy del frontend y API a Azure Static Web Apps
-      - name: Deploy to Azure
+      # Step 5: Deploy to Azure Static Web Apps
+      - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           app_location: "/"
           api_location: "api"
           output_location: "build"
+          deployment_action: "upload"
