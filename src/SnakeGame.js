@@ -5,6 +5,7 @@ import "./SnakeGame.css";
 
 const gridSize = 20;
 
+// Genera una nueva posición para la comida
 const generateFoodPosition = (snake, gridSize) => {
     const isPositionOccupied = (position) => {
         return snake.some(segment => segment.x === position.x && segment.y === position.y);
@@ -27,11 +28,12 @@ const SnakeGame = ({ playerName }) => {
     const [direction, setDirection] = useState({ x: 1, y: 0 });
     const [score, setScore] = useState(0);
     const [isGameOver, setIsGameOver] = useState(false);
+    const [scoreSaved, setScoreSaved] = useState(false); // Nuevo estado
 
     // Función para guardar el puntaje
     const saveScore = useCallback(async () => {
         try {
-            const response = await fetch("https://snakegameappservice.azurewebsites.net/api/addScore", {
+            const response = await fetch("/api/addscore", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ playerName, score }),
@@ -47,27 +49,21 @@ const SnakeGame = ({ playerName }) => {
         }
     }, [playerName, score]);
 
-    useEffect(() => {
-        if (isGameOver) {
-            saveScore();
-        }
-    }, [isGameOver, saveScore]);
-
-    // Lógica del juego, incluyendo la detección de colisiones y el manejo de la dirección
+    // Maneja las teclas para cambiar la dirección de la serpiente
     useEffect(() => {
         const handleKeyDown = (e) => {
             switch (e.key) {
                 case "ArrowUp":
-                    if (direction.y === 0) setDirection({ x: 0, y: -1 });
+                    if (direction.y !== 1) setDirection({ x: 0, y: -1 });
                     break;
                 case "ArrowDown":
-                    if (direction.y === 0) setDirection({ x: 0, y: 1 });
+                    if (direction.y !== -1) setDirection({ x: 0, y: 1 });
                     break;
                 case "ArrowLeft":
-                    if (direction.x === 0) setDirection({ x: -1, y: 0 });
+                    if (direction.x !== 1) setDirection({ x: -1, y: 0 });
                     break;
                 case "ArrowRight":
-                    if (direction.x === 0) setDirection({ x: 1, y: 0 });
+                    if (direction.x !== -1) setDirection({ x: 1, y: 0 });
                     break;
                 default:
                     break;
@@ -78,9 +74,16 @@ const SnakeGame = ({ playerName }) => {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [direction]);
 
+    // Guarda el puntaje cuando el juego termina (una sola vez)
     useEffect(() => {
-        if (isGameOver) return;
+        if (isGameOver && !scoreSaved) {
+            saveScore();
+            setScoreSaved(true); // Marca que el puntaje ya fue guardado
+        }
+    }, [isGameOver, scoreSaved, saveScore]);
 
+    // Lógica principal del juego
+    useEffect(() => {
         const interval = setInterval(() => {
             setSnake((prevSnake) => {
                 const newHead = {
@@ -88,15 +91,16 @@ const SnakeGame = ({ playerName }) => {
                     y: prevSnake[0].y + direction.y,
                 };
 
-                // Verifica si la serpiente colisiona con los bordes o consigo misma
+                // Verifica si el juego termina
                 if (
                     newHead.x < 0 ||
-                    newHead.x >= gridSize ||
                     newHead.y < 0 ||
+                    newHead.x >= gridSize ||
                     newHead.y >= gridSize ||
                     prevSnake.some(segment => segment.x === newHead.x && segment.y === newHead.y)
                 ) {
                     setIsGameOver(true);
+                    clearInterval(interval);
                     return prevSnake;
                 }
 
@@ -115,7 +119,7 @@ const SnakeGame = ({ playerName }) => {
         }, 200);
 
         return () => clearInterval(interval);
-    }, [direction, food, isGameOver]);
+    }, [direction, food]);
 
     // Reinicia el juego
     const handleRestart = () => {
@@ -124,6 +128,7 @@ const SnakeGame = ({ playerName }) => {
         setDirection({ x: 1, y: 0 });
         setScore(0);
         setIsGameOver(false);
+        setScoreSaved(false); // Reinicia el estado de guardado
     };
 
     return (
@@ -132,12 +137,14 @@ const SnakeGame = ({ playerName }) => {
             <p>Score: {score}</p>
             {isGameOver && (
                 <div>
-                    <p>Game Over</p>
+                    <h2>Game Over!</h2>
                     <button onClick={handleRestart}>Restart</button>
                 </div>
             )}
-            <Snake snake={snake} />
-            <Food food={food} />
+            <div className="grid">
+                <Snake segments={snake} />
+                <Food position={food} />
+            </div>
         </div>
     );
 };
