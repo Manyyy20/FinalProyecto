@@ -10,48 +10,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Clean repository
-      run: |
-        rm -rf node_modules
-        rm -rf backend/node_modules
-        find . -name 'package-lock.json' -delete
+      - name: Clean repository
+        run: |
+          rm -rf node_modules
+          rm -rf api/node_modules
+          find . -name 'package-lock.json' -delete
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
 
-    - name: Install frontend dependencies
-      run: npm install
-      working-directory: ./
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: ./
 
-    - name: Build frontend
-      run: npm run build
-      working-directory: ./
+      - name: Build frontend
+        run: npm run build
+        working-directory: ./
 
-    - name: Install backend dependencies
-      working-directory: ./api
-      run: npm install
+      - name: Install backend dependencies
+        run: npm install
+        working-directory: ./api
 
-    - name: Test backend
-      working-directory: ./api
-      run: npm test || echo "No backend tests defined, skipping"
-
-    - name: Deploy to Azure Static Web Apps
-      uses: Azure/static-web-apps-deploy@v1
-      with:
-        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-        app_location: "/"
-        api_location: "api"
-        output_location: "build"
-        deployment_action: "upload"
-
-    - name: Deploy to Azure App Service
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: "snakeGameAppService" # Cambia esto al nombre de tu App Service
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ./api
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          app_location: "/"
+          api_location: "api"
+          output_location: "build"
+          deployment_action: "upload"
