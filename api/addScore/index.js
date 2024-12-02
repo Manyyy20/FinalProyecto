@@ -40,17 +40,15 @@ app.post("/api/addScore", async (req, res) => {
     const { playerName, score } = req.body;
 
     if (!playerName || !score) {
+        console.error("Datos inválidos:", req.body);
         return res.status(400).send("playerName and score are required");
     }
 
     try {
-        // Conectar a la base de datos
+        console.log("Intentando conectar a la base de datos...");
         const pool = await sql.connect(dbConfig);
+        console.log("Conexión exitosa");
 
-        // Verificar conexión
-        console.log("Conexión a la base de datos establecida");
-
-        // Insertar el puntaje en la base de datos
         const result = await pool
             .request()
             .input("PlayerName", sql.NVarChar, playerName)
@@ -59,13 +57,14 @@ app.post("/api/addScore", async (req, res) => {
                 "INSERT INTO Scores (PlayerName, Score, Timestamp) VALUES (@PlayerName, @Score, GETDATE())"
             );
 
-        console.log("Resultado de la inserción:", result);
+        console.log("Resultado de la consulta:", result);
         res.status(200).send("Score added successfully");
     } catch (error) {
-        console.error("Error al agregar el puntaje:", error.message);
+        console.error("Error al procesar la solicitud:", error);
         res.status(500).send(`Error adding score: ${error.message}`);
     }
 });
+
 
 // Iniciar el servidor
 const port = process.env.PORT || 3000;
