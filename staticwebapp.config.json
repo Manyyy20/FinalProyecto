@@ -8,16 +8,6 @@
       "backend": "/api/addScore"
     },
     {
-      "route": "https://snakegameappservice.azurewebsites.net/api/addScore",
-      "methods": [
-        "get",
-        "post"
-      ],
-      "allowedRoles": [
-        "anonymous"
-      ]
-    },
-    {
       "route": "https://functionfunk.azurewebsites.net/api/addscore",
       "methods": [
         "get",
