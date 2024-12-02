@@ -32,17 +32,18 @@ const SnakeGame = ({ playerName }) => {
     // Función para guardar el puntaje
     const saveScore = useCallback(async () => {
         try {
-            await fetch("https://polite-field-0707b590f.5.azurestaticapps.net/api/addScore", {
+            const response = await fetch("https://polite-field-0707b590f.5.azurestaticapps.net/api/addScore", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ playerName, score }),
             });
 
-            if (response.ok) {
-                console.log("Score saved successfully.");
-            } else {
-                console.error("Failed to save score:", await response.text());
+            if (!response.ok) {
+                throw new Error(`Error: ${response.status} ${response.statusText}`);
             }
+
+            const data = await response.json();
+            console.log("Score saved successfully:", data);
         } catch (error) {
             console.error("Error saving score:", error);
         }
