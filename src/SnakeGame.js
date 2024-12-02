@@ -41,7 +41,6 @@ const SnakeGame = ({ playerName }) => {
             if (!response.ok) {
                 throw new Error(`Error: ${response.status} ${response.statusText}`);
             }
-            T
             const data = await response.json();
             console.log("Score saved successfully:", data);
         } catch (error) {
