@@ -2,12 +2,13 @@ const cors = require("cors");
 const express = require("express");
 const bodyParser = require("body-parser");
 const sql = require("mssql");
+require("dotenv").config(); // Carga las variables de entorno desde el archivo .env
 
 const app = express();
 
 // Configurar CORS
 const corsOptions = {
-    origin: "https://polite-field-0707b590f.5.azurestaticapps.net", // Cambia esta URL a la de tu Static Web App
+    origin: "https://polite-field-0707b590f.5.azurestaticapps.net", // Cambia esta URL si es necesario
     methods: ["GET", "POST"], // Métodos permitidos
     allowedHeaders: ["Content-Type"], // Encabezados permitidos
 };
@@ -15,14 +16,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-// Configuración de la base de datos
+// Configuración de la base de datos usando la cadena de conexión
 const dbConfig = {
-    user: process.env.DB_USER || "sqladmin",
-    password: process.env.DB_PASSWORD || "Password22",
-    server: process.env.DB_SERVER || "snakegamesqlserver.database.windows.net",
-    database: process.env.DB_DATABASE || "snakeGameDatabase",
+    connectionString: process.env.DB_CONNECTION_STRING,
     options: {
-        encrypt: true,
+        encrypt: true, // Habilita la encriptación
     },
 };
 
@@ -30,35 +28,24 @@ const dbConfig = {
 app.post("/api/addScore", async (req, res) => {
     const { playerName, score } = req.body;
 
-    // Validar los datos de entrada
-    if (!playerName || typeof playerName !== "string" || !score || typeof score !== "number") {
-        return res.status(400).send("Invalid input. 'playerName' must be a string and 'score' must be a number.");
+    if (!playerName || !score) {
+        return res.status(400).send("playerName and score are required");
     }
 
     try {
         // Conectar a la base de datos
         const pool = await sql.connect(dbConfig);
 
-        // Ejecutar la consulta
-        const result = await pool.request()
-            .input("playerName", sql.NVarChar, playerName)
-            .input("score", sql.Int, score)
-            .query("INSERT INTO Scores (PlayerName, Score) VALUES (@playerName, @score)");
+        // Insertar el puntaje en la base de datos
+        await pool.request()
+            .input("PlayerName", sql.NVarChar, playerName)
+            .input("Score", sql.Int, score)
+            .query("INSERT INTO Scores (PlayerName, Score) VALUES (@PlayerName, @Score)");
 
-        console.log("Result from database:", result);
         res.status(200).send("Score added successfully");
     } catch (error) {
-        // Capturar errores específicos
-        if (error.code === "ETIMEOUT") {
-            console.error("Database connection timed out:", error);
-            res.status(500).send("Database connection timed out");
-        } else if (error.code === "ELOGIN") {
-            console.error("Invalid database credentials:", error);
-            res.status(500).send("Invalid database credentials");
-        } else {
-            console.error("Error adding score:", error);
-            res.status(500).send("An unexpected error occurred while adding the score");
-        }
+        console.error("Error adding score:", error);
+        res.status(500).send("Error adding score");
     }
 });
 
