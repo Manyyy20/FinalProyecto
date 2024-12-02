@@ -2,10 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "appServiceName": {
-            "type": "string",
-            "defaultValue": "snakeGameAppService"
-        },
         "sqlServerName": {
             "type": "string",
             "defaultValue": "snakeGameSqlServer"
@@ -17,25 +13,13 @@
         "staticWebAppName": {
             "type": "string",
             "defaultValue": "snakeGameStaticWebApp"
+        },
+        "functionAppName": {
+            "type": "string",
+            "defaultValue": "snakeGameFunctionApp"
         }
     },
     "resources": [
-        {
-            "type": "Microsoft.Web/sites",
-            "apiVersion": "2021-02-01",
-            "name": "[parameters('appServiceName')]",
-            "location": "eastus2",
-            "properties": {
-                "siteConfig": {
-                    "appSettings": [
-                        {
-                            "name": "WEBSITE_RUN_FROM_PACKAGE",
-                            "value": "1"
-                        }
-                    ]
-                }
-            }
-        },
         {
             "type": "Microsoft.Sql/servers",
             "apiVersion": "2021-02-01-preview",
@@ -75,6 +59,40 @@
                 "apiLocation": "api",
                 "outputLocation": "build"
             }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2021-02-01",
+            "name": "[parameters('functionAppName')]",
+            "location": "eastus2",
+            "kind": "functionapp,linux",
+            "properties": {
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~4"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "node"
+                        },
+                        {
+                            "name": "WEBSITE_RUN_FROM_PACKAGE",
+                            "value": "1"
+                        },
+                        {
+                            "name": "SQL_CONNECTION",
+                            "value": "Server=tcp:[parameters('sqlServerName')].database.windows.net,1433;Initial Catalog=[parameters('sqlDatabaseName')];Persist Security Info=False;User ID=sqladmin;Password=Password22;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+                        }
+                    ]
+                },
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', 'FunctionAppHostingPlan')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]",
+                "[resourceId('Microsoft.Web/staticSites', parameters('staticWebAppName'))]"
+            ]
         }
     ]
 }

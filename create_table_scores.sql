@@ -1,0 +1,6 @@
+CREATE TABLE Scores (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    PlayerName NVARCHAR(255) NOT NULL,
+    Score INT NOT NULL,
+    Timestamp DATETIME DEFAULT GETDATE()
+);
