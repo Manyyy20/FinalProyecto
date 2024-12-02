@@ -11,7 +11,7 @@ app.use(cors());
 
 // Middleware
 app.use(bodyParser.json());
-
+//test
 // Configuración de la base de datos
 const dbConfig = {
     user: process.env.DB_USER || "sqladmin",
