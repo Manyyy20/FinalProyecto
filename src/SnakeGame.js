@@ -31,7 +31,7 @@ const SnakeGame = ({ playerName }) => {
 
     const saveScore = useCallback(async () => {
         try {
-            const response = await fetch("https://snakegameappservice.azurewebsites.net/api/addScore", {
+            await fetch("https://snakegameappservice.azurewebsites.net/api/addScore", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ playerName, score }),
