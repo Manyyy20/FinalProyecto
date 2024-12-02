@@ -6,7 +6,13 @@ const sql = require("mssql");
 const app = express();
 
 // Configurar CORS
-app.use(cors());
+const corsOptions = {
+    origin: "https://polite-field-0707b590f.5.azurestaticapps.net", // Cambia esta URL a la de tu Static Web App
+    methods: ["GET", "POST"], // Métodos permitidos
+    allowedHeaders: ["Content-Type"], // Encabezados permitidos
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // Configuración de la base de datos
@@ -29,21 +35,21 @@ app.post("/api/addScore", async (req, res) => {
     }
 
     try {
-        const pool = await sql.connect(dbConfig);
-        await pool.request()
-            .input("playerName", sql.NVarChar, playerName)
-            .input("score", sql.Int, score)
-            .query("INSERT INTO Scores (PlayerName, Score) VALUES (@playerName, @score)");
+        // Conectar a la base de datos
+        await sql.connect(dbConfig);
+
+        // Insertar el puntaje en la base de datos
+        const result = await sql.query`INSERT INTO Scores (PlayerName, Score) VALUES (${playerName}, ${score})`;
 
         res.status(200).send("Score added successfully");
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error saving score");
+    } catch (error) {
+        console.error("Error adding score:", error);
+        res.status(500).send("Error adding score");
     }
 });
 
-// Exportar como una función de Azure
-module.exports = async function (context, req) {
-    const expressApp = app;
-    expressApp(req, context.res);
-};
+// Iniciar el servidor
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
