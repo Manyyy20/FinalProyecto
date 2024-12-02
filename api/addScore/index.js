@@ -6,15 +6,8 @@ module.exports = async function (context, req) {
 
     if (playerName && score) {
         try {
-            const pool = await sql.connect({
-                user: process.env.DB_USER || "sqladmin",
-                password: process.env.DB_PASSWORD || "Password22",
-                server: process.env.DB_SERVER || "snakegamesqlserver.database.windows.net",
-                database: process.env.DB_DATABASE || "snakeGameDatabase",
-                options: {
-                    encrypt: true,
-                },
-            });
+            // Usar la connection string desde la variable de entorno
+            const pool = await sql.connect(process.env.SQL_CONNECTION);
 
             const result = await pool
                 .request()
