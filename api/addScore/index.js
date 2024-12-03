@@ -32,7 +32,7 @@ module.exports = async function (context, req) {
         };
         return;
     }
-
+    //hola
     try {
         // Conexión a la base de datos usando configuración detallada
         context.log("Connecting to the database...");
