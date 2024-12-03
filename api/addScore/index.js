@@ -1,5 +1,6 @@
 require('dotenv').config(); // Cargar variables del archivo .env
 const sql = require("mssql");
+console.log(process.env.DB_SERVER);
 
 module.exports = async function (context, req) {
     context.log("Request received.");
