@@ -49,7 +49,7 @@ const SnakeGame = ({ playerName }) => {
         }
     }, [playerName, score]);
 
-
+    //test
     // Maneja las teclas para cambiar la dirección de la serpiente
     useEffect(() => {
         const handleKeyDown = (e) => {
