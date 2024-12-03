@@ -33,7 +33,7 @@ const SnakeGame = ({ playerName }) => {
     // Función para guardar el puntaje
     const saveScore = useCallback(async () => {
         try {
-            const response = await fetch("/api/addscore", {
+            const response = await fetch("https://functionfunk.azurewebsites.net/api/addscore", { // URL absoluto
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ playerName, score }),
@@ -48,6 +48,7 @@ const SnakeGame = ({ playerName }) => {
             console.error("Error saving score:", error);
         }
     }, [playerName, score]);
+
 
     // Maneja las teclas para cambiar la dirección de la serpiente
     useEffect(() => {

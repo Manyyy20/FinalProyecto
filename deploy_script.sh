@@ -19,20 +19,31 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Configurar reglas de firewall para permitir la IP actual
-echo "Configurando reglas de firewall para la IP actual..."
-CURRENT_IP=$(curl -s https://api.ipify.org)
+# Configurar reglas de firewall en SQL Server
+echo "Configurando reglas de firewall en SQL Server..."
 az sql server firewall-rule create \
     --resource-group $RESOURCE_GROUP \
-    --server $SQL_SERVER_NAME \
-    --name AllowClientIP \
-    --start-ip-address $CURRENT_IP \
-    --end-ip-address $CURRENT_IP
+    --server-name $SQL_SERVER_NAME \
+    --name AllowAzureServices \
+    --start-ip-address 0.0.0.0 \
+    --end-ip-address 0.0.0.0
 
-if [ $? -ne 0 ]; then
-    echo "Error: No se pudieron configurar las reglas de firewall."
-    exit 1
-fi
+az sql server firewall-rule create \
+    --resource-group $RESOURCE_GROUP \
+    --server-name $SQL_SERVER_NAME \
+    --name AllowClientVPN \
+    --start-ip-address <START_VPN_IP> \
+    --end-ip-address <END_VPN_IP>
+
+# Opcional: Agregar tu IP pública actual automáticamente
+MY_IP=$(curl -s http://ipinfo.io/ip)
+az sql server firewall-rule create \
+    --resource-group $RESOURCE_GROUP \
+    --server-name $SQL_SERVER_NAME \
+    --name AllowMyIP \
+    --start-ip-address $MY_IP \
+    --end-ip-address $MY_IP
+
 
 # Crear la tabla en la base de datos
 echo "Creando tabla 'Scores' en la base de datos..."
