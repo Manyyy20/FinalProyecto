@@ -19,13 +19,16 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Configurar reglas de firewall para permitir la IP actual
-echo "Configurando reglas de firewall para la IP actual..."
+# Obtener la IP pública actual correcta
 CURRENT_IP=$(curl -s https://api.ipify.org)
+
+# Configurar reglas de firewall en SQL Server
+echo "Configurando reglas de firewall en SQL Server..."
+
 az sql server firewall-rule create \
     --resource-group $RESOURCE_GROUP \
     --server $SQL_SERVER_NAME \
-    --name AllowClientIP \
+    --name AllowCurrentIP \
     --start-ip-address $CURRENT_IP \
     --end-ip-address $CURRENT_IP
 
