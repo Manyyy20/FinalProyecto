@@ -7,7 +7,7 @@ module.exports = async function (context, req) {
     // Obtener datos del cuerpo de la solicitud
     const playerName = req.body?.playerName;
     const score = req.body?.score;
-
+    //test
     // Validar datos de entrada
     if (!playerName || typeof playerName !== 'string') {
         context.log.warn("Invalid or missing playerName");
