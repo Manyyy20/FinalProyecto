@@ -38,7 +38,7 @@ az sql server firewall-rule create \
     --name AllowCurrentIP \
     --start-ip-address $REAL_IP \
     --end-ip-address $REAL_IP
-    
+
 if [ $? -ne 0 ]; then
     echo "Error: No se pudieron configurar las reglas de firewall."
     exit 1
@@ -62,7 +62,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 cd ..
-
+#test
 # Configurar variables de entorno adicionales para la Function App
 echo "Configurando variables de entorno adicionales para Function App..."
 az functionapp config appsettings set --name $FUNCTION_APP_NAME --resource-group $RESOURCE_GROUP --settings \
