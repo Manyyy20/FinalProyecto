@@ -44,7 +44,6 @@ az sql server firewall-rule create \
     --start-ip-address $MY_IP \
     --end-ip-address $MY_IP
 
-
 # Crear la tabla en la base de datos
 echo "Creando tabla 'Scores' en la base de datos..."
 sqlcmd -S "$SQL_SERVER_NAME.database.windows.net" -d $SQL_DATABASE_NAME -U $SQL_ADMIN_USERNAME -P $SQL_ADMIN_PASSWORD -i create_table_scores.sql
@@ -70,10 +69,22 @@ az functionapp config appsettings set --name $FUNCTION_APP_NAME --resource-group
     DB_USER=$SQL_ADMIN_USERNAME \
     DB_PASSWORD=$SQL_ADMIN_PASSWORD \
     DB_SERVER=$SQL_SERVER_NAME.database.windows.net \
-    DB_DATABASE=$SQL_DATABASE_NAME
+    DB_DATABASE=$SQL_DATABASE_NAME \
+    SQL_CONNECTION="Server=tcp:$SQL_SERVER_NAME.database.windows.net,1433;Initial Catalog=$SQL_DATABASE_NAME;Persist Security Info=False;User ID=$SQL_ADMIN_USERNAME;Password=$SQL_ADMIN_PASSWORD;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 
 if [ $? -ne 0 ]; then
     echo "Error: No se pudieron configurar las variables de entorno adicionales."
+    exit 1
+fi
+
+# Obtener la URL de Static Web App y configurar CORS en la Function App
+echo "Configurando CORS en Function App..."
+STATIC_WEB_APP_URL=$(az staticwebapp show --name $STATIC_WEB_APP_NAME --resource-group $RESOURCE_GROUP --query "defaultHostname" -o tsv)
+
+az functionapp cors add --name $FUNCTION_APP_NAME --resource-group $RESOURCE_GROUP --allowed-origins "https://$STATIC_WEB_APP_URL"
+
+if [ $? -ne 0 ]; then
+    echo "Error: No se pudo configurar CORS en la Function App."
     exit 1
 fi
 
