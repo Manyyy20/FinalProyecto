@@ -24,7 +24,6 @@ CURRENT_IP=$(curl -s https://api.ipify.org)
 
 # Configurar reglas de firewall en SQL Server
 echo "Configurando reglas de firewall en SQL Server..."
-
 az sql server firewall-rule create \
     --resource-group $RESOURCE_GROUP \
     --server $SQL_SERVER_NAME \
@@ -36,7 +35,7 @@ if [ $? -ne 0 ]; then
     echo "Error: No se pudieron configurar las reglas de firewall."
     exit 1
 fi
-#teest
+
 # Crear la tabla en la base de datos
 echo "Creando tabla 'Scores' en la base de datos..."
 sqlcmd -S "$SQL_SERVER_NAME.database.windows.net" -d $SQL_DATABASE_NAME -U $SQL_ADMIN_USERNAME -P $SQL_ADMIN_PASSWORD -i create_table_scores.sql
@@ -57,7 +56,6 @@ fi
 cd ..
 
 # Configurar variables de entorno adicionales para la Function App
-echo "Configurando variables de entorno adicionales para Function App..."
 az functionapp config appsettings set --name $FUNCTION_APP_NAME --resource-group $RESOURCE_GROUP --settings \
     DB_USER=$SQL_ADMIN_USERNAME \
     DB_PASSWORD=$SQL_ADMIN_PASSWORD \
@@ -70,10 +68,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Obtener la URL de Static Web App y configurar CORS en la Function App
-echo "Configurando CORS en Function App..."
+# Configurar CORS en Function App
 STATIC_WEB_APP_URL=$(az staticwebapp show --name $STATIC_WEB_APP_NAME --resource-group $RESOURCE_GROUP --query "defaultHostname" -o tsv)
-
 az functionapp cors add --name $FUNCTION_APP_NAME --resource-group $RESOURCE_GROUP --allowed-origins "https://$STATIC_WEB_APP_URL"
 
 if [ $? -ne 0 ]; then
@@ -92,5 +88,5 @@ if [ $? -ne 0 ]; then
     echo "Error: No se pudo agregar el secreto en GitHub."
     exit 1
 fi
-
+#test
 echo "Despliegue completado exitosamente."
