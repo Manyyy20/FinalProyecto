@@ -36,7 +36,7 @@ if [ $? -ne 0 ]; then
     echo "Error: No se pudieron configurar las reglas de firewall."
     exit 1
 fi
-
+#teest
 # Crear la tabla en la base de datos
 echo "Creando tabla 'Scores' en la base de datos..."
 sqlcmd -S "$SQL_SERVER_NAME.database.windows.net" -d $SQL_DATABASE_NAME -U $SQL_ADMIN_USERNAME -P $SQL_ADMIN_PASSWORD -i create_table_scores.sql
