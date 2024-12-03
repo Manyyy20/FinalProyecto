@@ -53,6 +53,19 @@ if [ $? -ne 0 ]; then
 fi
 cd ..
 
+# Configurar variables de entorno adicionales para la Function App
+echo "Configurando variables de entorno adicionales para Function App..."
+az functionapp config appsettings set --name $FUNCTION_APP_NAME --resource-group $RESOURCE_GROUP --settings \
+    DB_USER=$SQL_ADMIN_USERNAME \
+    DB_PASSWORD=$SQL_ADMIN_PASSWORD \
+    DB_SERVER=$SQL_SERVER_NAME.database.windows.net \
+    DB_DATABASE=$SQL_DATABASE_NAME
+
+if [ $? -ne 0 ]; then
+    echo "Error: No se pudieron configurar las variables de entorno adicionales."
+    exit 1
+fi
+
 # Configurar Deployment Token en GitHub
 echo "Obteniendo Deployment Token..."
 DEPLOYMENT_TOKEN=$(az staticwebapp secrets list --name $STATIC_WEB_APP_NAME --resource-group $RESOURCE_GROUP --query "properties.apiKey" -o tsv)

@@ -21,7 +21,11 @@
         "environmentVariables": {
             "type": "object",
             "defaultValue": {
-                "SQL_CONNECTION": "Server=tcp:snakegamesqlserver.database.windows.net,1433;Initial Catalog=snakeGameDatabase;Persist Security Info=False;User ID=sqladmin;Password=Password22;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+                "SQL_CONNECTION": "Server=tcp:snakegamesqlserver.database.windows.net,1433;Initial Catalog=snakeGameDatabase;Persist Security Info=False;User ID=sqladmin;Password=Password22;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+                "DB_USER": "sqladmin",
+                "DB_PASSWORD": "Password22",
+                "DB_SERVER": "snakegamesqlserver.database.windows.net",
+                "DB_DATABASE": "snakeGameDatabase"
             }
         }
     },
@@ -73,6 +77,22 @@
                         {
                             "name": "SQL_CONNECTION",
                             "value": "[parameters('environmentVariables').SQL_CONNECTION]"
+                        },
+                        {
+                            "name": "DB_USER",
+                            "value": "[parameters('environmentVariables').DB_USER]"
+                        },
+                        {
+                            "name": "DB_PASSWORD",
+                            "value": "[parameters('environmentVariables').DB_PASSWORD]"
+                        },
+                        {
+                            "name": "DB_SERVER",
+                            "value": "[parameters('environmentVariables').DB_SERVER]"
+                        },
+                        {
+                            "name": "DB_DATABASE",
+                            "value": "[parameters('environmentVariables').DB_DATABASE]"
                         }
                     ]
                 }
