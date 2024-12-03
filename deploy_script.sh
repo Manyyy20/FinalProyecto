@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Variables
+# Variables del entorno
 RESOURCE_GROUP="ProyectoFinal2"
 ARM_TEMPLATE="arm_template_no_storage.json"
 STATIC_WEB_APP_NAME="snakeGameStaticWebApp"
 FUNCTION_APP_NAME="functionfunk"
-SQL_SERVER_NAME="snakeGameSqlServer"
+SQL_SERVER_NAME="snakegamesqlserver"
 SQL_DATABASE_NAME="snakeGameDatabase"
 SQL_ADMIN_USERNAME="sqladmin"
 SQL_ADMIN_PASSWORD="Password22"
@@ -19,11 +19,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Obtener la IP pública actual
+# Configurar reglas de firewall para permitir la IP actual
+echo "Configurando reglas de firewall para la IP actual..."
 CURRENT_IP=$(curl -s https://api.ipify.org)
-
-# Configurar CORS para permitir la IP actual
-echo "Configurando reglas de firewall para la IP actual: $CURRENT_IP..."
 az sql server firewall-rule create \
     --resource-group $RESOURCE_GROUP \
     --server $SQL_SERVER_NAME \
@@ -32,18 +30,13 @@ az sql server firewall-rule create \
     --end-ip-address $CURRENT_IP
 
 if [ $? -ne 0 ]; then
-    echo "Error: No se pudieron configurar las reglas de firewall para la IP actual."
+    echo "Error: No se pudieron configurar las reglas de firewall."
     exit 1
 fi
 
-
-# Crear la tabla 'Scores' en la base de datos
+# Crear la tabla en la base de datos
 echo "Creando tabla 'Scores' en la base de datos..."
-sqlcmd -S "$SQL_SERVER_NAME.database.windows.net" \
-       -d $SQL_DATABASE_NAME \
-       -U $SQL_ADMIN_USERNAME \
-       -P $SQL_ADMIN_PASSWORD \
-       -i create_table_scores.sql
+sqlcmd -S "$SQL_SERVER_NAME.database.windows.net" -d $SQL_DATABASE_NAME -U $SQL_ADMIN_USERNAME -P $SQL_ADMIN_PASSWORD -i create_table_scores.sql
 
 if [ $? -ne 0 ]; then
     echo "Error: No se pudo crear la tabla 'Scores'."
@@ -60,19 +53,7 @@ if [ $? -ne 0 ]; then
 fi
 cd ..
 
-# Configurar variables de entorno para Function App
-echo "Configurando variables de entorno para la Function App..."
-az functionapp config appsettings set \
-    --name $FUNCTION_APP_NAME \
-    --resource-group $RESOURCE_GROUP \
-    --settings "SQL_CONNECTION=Your_Connection_String" "ANOTHER_VARIABLE=Another_Value"
-
-if [ $? -ne 0 ]; then
-    echo "Error: No se pudieron configurar las variables de entorno."
-    exit 1
-fi
-
-# Configurar el Deployment Token en GitHub
+# Configurar Deployment Token en GitHub
 echo "Obteniendo Deployment Token..."
 DEPLOYMENT_TOKEN=$(az staticwebapp secrets list --name $STATIC_WEB_APP_NAME --resource-group $RESOURCE_GROUP --query "properties.apiKey" -o tsv)
 

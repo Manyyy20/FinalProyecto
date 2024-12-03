@@ -18,15 +18,10 @@
             "type": "string",
             "defaultValue": "functionfunk"
         },
-        "hostingPlanName": {
-            "type": "string",
-            "defaultValue": "FunctionAppHostingPlan"
-        },
         "environmentVariables": {
             "type": "object",
             "defaultValue": {
-                "SQL_CONNECTION": "Your_Connection_String",
-                "ANOTHER_VARIABLE": "Another_Value"
+                "SQL_CONNECTION": "Server=tcp:snakegamesqlserver.database.windows.net,1433;Initial Catalog=snakeGameDatabase;Persist Security Info=False;User ID=sqladmin;Password=Password22;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
             }
         }
     },
@@ -78,10 +73,6 @@
                         {
                             "name": "SQL_CONNECTION",
                             "value": "[parameters('environmentVariables').SQL_CONNECTION]"
-                        },
-                        {
-                            "name": "ANOTHER_VARIABLE",
-                            "value": "[parameters('environmentVariables').ANOTHER_VARIABLE]"
                         }
                     ]
                 }
